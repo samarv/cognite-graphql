@@ -1,0 +1,9 @@
+sources:
+  - name: MyOpenapiApi
+    handler:
+      openapi:
+        source: ./cogniteV789.json
+        baseUrl: "https://api.cognitedata.com"
+        operationHeaders:
+          # Please do not use capital letters while getting the headers
+          Authorization: Bearer {context.variables['x-cognite-token']}

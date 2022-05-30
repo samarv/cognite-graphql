@@ -1,0 +1,4401 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type Query {
+  """
+  Retrieve the contents of a 3D file.
+  
+  This endpoint supported tag-based caching.
+  
+  This endpoint is only compatible with 3D file IDs from the 3D API, and not compatible with
+  file IDs from the Files API.
+  
+  Equivalent to GET /api/v1/projects/{project}/3d/files/{threedFileId}
+  """
+  apiV1Project3dFile(
+    """The project name."""
+    project: String!
+    """The ID of the 3D file to retrieve."""
+    threedFileId: Float!
+  ): String
+  """
+  Get the results for converting an engineering diagram to SVG and PNG formats.
+  
+  Equivalent to GET /api/v1/projects/{project}/context/diagram/convert/{jobId}
+  """
+  apiV1ProjectContextDiagramConvert3(
+    jobId: Float!
+    """The project name."""
+    project: String!
+  ): ApiV1ProjectContextDiagramConvert3
+  """
+  Get the results from an engineering diagram detect job.
+  
+  Equivalent to GET /api/v1/projects/{project}/context/diagram/detect/{jobId}
+  """
+  apiV1ProjectContextDiagramDetect3(
+    jobId: Float!
+    """The project name."""
+    project: String!
+  ): ApiV1ProjectContextDiagramDetect3
+  """
+  List all available entity matching models.
+  
+  Equivalent to GET /api/v1/projects/{project}/context/entitymatching/
+  """
+  apiV1ProjectContextEntitymatching(
+    """Limits the number of results to be returned. The maximum results returned by the server is 1000 even if you specify a higher limit."""
+    limit: Int
+    """The project name."""
+    project: String!
+  ): ApiV1ProjectContextEntitymatching
+  """
+  Shows the status of the model. If the status is completed, shows the parameters used to train the model.
+  
+  Equivalent to GET /api/v1/projects/{project}/context/entitymatching/{id}
+  """
+  apiV1ProjectContextEntitymatching3(
+    id: Float!
+    """The project name."""
+    project: String!
+  ): ApiV1ProjectContextEntitymatching3
+  """
+  Get the results from a predict job.
+  
+  Equivalent to GET /api/v1/projects/{project}/context/entitymatching/jobs/{jobId}
+  """
+  apiV1ProjectContextEntitymatchingJob(
+    jobId: Float!
+    """The project name."""
+    project: String!
+  ): ApiV1ProjectContextEntitymatchingJob
+  """
+  The GET /files/icon operation can be used to get an image representation of a file.
+  
+  Either id or externalId must be provided as a query parameter (but not both).
+  Supported file formats:
+  - Normal jpeg and png files are currently fully supported.
+  - Other image file formats might work, but continued support for these are not guaranteed.
+  - Currently only supporting thumbnails for image files.
+  Attempts to get icon for unsupported files will result in status 400.
+  
+  Equivalent to GET /api/v1/projects/{project}/files/icon
+  """
+  apiV1ProjectFilesIcon(
+    externalId: String
+    id: Float
+    """The project name."""
+    project: String!
+  ): String
+  """
+  Retrieve an asset by its ID. If you want to retrieve assets by externalIds, use Retrieve assets instead.
+  
+  Equivalent to GET /api/v1/projects/{project}/assets/{id}
+  """
+  asset(
+    id: Float!
+    """The project name."""
+    project: String!
+  ): Asset
+  """
+  List all asset mappings
+  
+  
+  Asset references obtained from a mapping - through asset ids - may be
+  invalid, simply by the non-transactional nature of HTTP.
+  They are NOT maintained by any means from CDF, meaning they will be stored until the
+  reference is removed through the delete endpoint of 3d asset mappings.
+  
+  Equivalent to GET /api/v1/projects/{project}/3d/models/{modelId}/revisions/{revisionId}/mappings
+  """
+  assetMapping3DWithCursorResponse(
+    assetId: Float
+    """Cursor for paging through results."""
+    cursor: String
+    """
+    Example: `{"min":[0.0, 0.0, 0.0], "max":[1.0, 1.0, 1.0]}`
+    
+    If given, only return asset mappings for assets whose bounding box
+    intersects the given bounding box.
+    
+    Must be a JSON object with `min`, `max` arrays of coordinates.
+    
+    """
+    intersectsBoundingBox: String
+    """Limits the number of results to be returned. The maximum results returned by the server is 1000 even if you specify a higher limit."""
+    limit: Int
+    """Model ID."""
+    modelId: Float!
+    nodeId: Float
+    """The project name."""
+    project: String!
+    """Revision ID."""
+    revisionId: Float!
+  ): AssetMapping3DWithCursorResponse
+  """
+  Retrieve cursors based on the last updated time range. Normally this endpoint is used for reading in parallel.
+  
+  Each cursor should be supplied as the 'cursor' query parameter on GET requests to [Read Rows](#operation/getRows).
+  **Note** that the 'minLastUpdatedTime' and the 'maxLastUpdatedTime' query parameter on [Read Rows](#operation/getRows) are ignored when a cursor is specified.
+  
+  
+  Equivalent to GET /api/v1/projects/{project}/raw/dbs/{dbName}/tables/{tableName}/cursors
+  """
+  dataRawDBTableCursors(
+    """Name of the database."""
+    dbName: String!
+    """An inclusive filter, specified as the number of milliseconds that have elapsed since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+    maxLastUpdatedTime: Float
+    """An exclusive filter, specified as the number of milliseconds that have elapsed since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+    minLastUpdatedTime: Float
+    """The number of cursors to return, by default it's 10."""
+    numberOfCursors: Int
+    """The project name."""
+    project: String!
+    """Name of the table."""
+    tableName: String!
+  ): DataRawDBTableCursors
+  """
+  The GET /files operation can be used to return information for all files in a project. 
+  
+  Optionally you can add one or more of the following query parameters. 
+  The filter query parameters will filter the results to only include files that match all filter parameters.
+  
+  Equivalent to GET /api/v1/projects/{project}/files
+  """
+  dataWithCursor(
+    """Asset external IDs of related equipment that this file relates to. Takes 1..100 unique items."""
+    assetExternalIds: String
+    assetIds: [Float]
+    """Only include files that have a related asset in a subtree rooted at any of these assetExternalIds (including the roots given). If the total size of the given subtrees exceeds 100,000 assets, an error will be returned."""
+    assetSubtreeExternalIds: String
+    """Only include files that have a related asset in a subtree rooted at any of these assetIds (including the roots given). If the total size of the given subtrees exceeds 100,000 assets, an error will be returned."""
+    assetSubtreeIds: String
+    """Cursor for paging through results."""
+    cursor: String
+    dataSetIds: [JSON]
+    externalIdPrefix: String
+    """Limits the number of results to be returned. The maximum results returned by the server is 1000 even if you specify a higher limit."""
+    limit: Int
+    maxCreatedTime: Float
+    maxLastUpdatedTime: Float
+    """Include files that have sourceCreatedTime set and with maximum this value."""
+    maxSourceCreatedTime: Float
+    """Include files that have sourceModifiedTime set and with maximum this value."""
+    maxSourceModifiedTime: Float
+    maxUploadedTime: Float
+    mimeType: String
+    minCreatedTime: Float
+    minLastUpdatedTime: Float
+    """Include files that have sourceCreatedTime set and with minimum this value."""
+    minSourceCreatedTime: Float
+    """Include files that have sourceModifiedTime set and with minimum this value."""
+    minSourceModifiedTime: Float
+    minUploadedTime: Float
+    name: String
+    """
+    Splits the data set into N partitions.
+    You need to follow the cursors within each partition in order to receive all the data.
+    Example: 1/10
+    
+    """
+    partition: String
+    """The project name."""
+    project: String!
+    """Only include files that have a related asset in a tree rooted at any of these root assetIds."""
+    rootAssetIds: String
+    source: String
+    """Whether or not the actual file is uploaded. This field is returned only by the API, it has no effect in a post body."""
+    uploaded: Boolean
+  ): DataWithCursor
+  """
+  List all assets, or only the assets matching the specified query.
+  
+  Equivalent to GET /api/v1/projects/{project}/assets
+  """
+  dataWithCursorAsset(
+    """List only assets that are in a subtree rooted at any of these assetExternalIds. If the total size of the given subtrees exceeds 100,000 assets, an error will be returned."""
+    assetSubtreeExternalIds: String
+    """List only assets that are in a subtree rooted at any of these assetIds (including the roots given).  If the total size of the given subtrees exceeds 100,000 assets, an error will be returned."""
+    assetSubtreeIds: String
+    """Cursor for paging through results."""
+    cursor: String
+    externalIdPrefix: String
+    """Whether the metadata field should be returned, or not."""
+    includeMetadata: Boolean
+    """Limits the number of results to be returned. The maximum results returned by the server is 1000 even if you specify a higher limit."""
+    limit: Int
+    maxCreatedTime: Float
+    maxLastUpdatedTime: Float
+    minCreatedTime: Float
+    minLastUpdatedTime: Float
+    name: String
+    """List only assets that have one of the parentExternalIds as a parent. The parentId for root assets is null."""
+    parentExternalIds: String
+    """List only assets that have one of the parentIds as a parent. The parentId for root assets is null."""
+    parentIds: String
+    """
+    Splits the data set into N partitions.
+    You need to follow the cursors within each partition in order to receive all the data.
+    Example: 1/10
+    
+    """
+    partition: String
+    """The project name."""
+    project: String!
+    root: Boolean
+    """This parameter is deprecated. Use assetSubtreeIds instead. List only assets that have one of the rootIds as a root asset. A root asset is its own root asset."""
+    rootIds: String
+    source: String
+  ): DataWithCursorAsset
+  """
+  List time series. Use nextCursor to paginate through the results.
+  
+  Equivalent to GET /api/v1/projects/{project}/timeseries
+  """
+  dataWithCursorGetTimeSeriesMetadataDTO(
+    """Get the time series related to the assets. The format is a list of IDs serialized as a JSON array(int64). Takes [ 1 .. 100 ] unique items."""
+    assetIds: String
+    """Cursor for paging through results."""
+    cursor: String
+    externalIdPrefix: String
+    """Whether the metadata field should be returned, or not."""
+    includeMetadata: Boolean
+    """Limits the number of results to return. CDF returns a maximum of 1000 results even if you specify a higher limit."""
+    limit: Int
+    """
+    Splits the data set into N partitions.
+    You need to follow the cursors within each partition in order to receive all the data.
+    Example: 1/10
+    
+    """
+    partition: String
+    """The project name."""
+    project: String!
+    """Only include time series that have a related asset in a tree rooted at any of these root assetIds."""
+    rootAssetIds: String
+  ): DataWithCursorGetTimeSeriesMetadataDTO
+  """
+  List databases
+  
+  Equivalent to GET /api/v1/projects/{project}/raw/dbs
+  """
+  dataWithCursorRawDB(
+    """Cursor for paging through results."""
+    cursor: String
+    """Limit on the number of databases to be returned."""
+    limit: Int
+    """The project name."""
+    project: String!
+  ): DataWithCursorRawDB
+  """
+  Retrieve rows from a table
+  
+  Equivalent to GET /api/v1/projects/{project}/raw/dbs/{dbName}/tables/{tableName}/rows
+  """
+  dataWithCursorRawDBRow(
+    """Ordered list of column keys, separated by commas. Leave empty for all, use single comma to retrieve only row keys."""
+    columns: String
+    """Cursor for paging through results."""
+    cursor: String
+    """Name of the database."""
+    dbName: String!
+    """Limit the number of results."""
+    limit: Int
+    """An inclusive filter, specified as the number of milliseconds that have elapsed since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+    maxLastUpdatedTime: Float
+    """An exclusive filter, specified as the number of milliseconds that have elapsed since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+    minLastUpdatedTime: Float
+    """The project name."""
+    project: String!
+    """Name of the table."""
+    tableName: String!
+  ): DataWithCursorRawDBRow
+  """
+  List tables in a database
+  
+  Equivalent to GET /api/v1/projects/{project}/raw/dbs/{dbName}/tables
+  """
+  dataWithCursorRawDBTable(
+    """Cursor for paging through results."""
+    cursor: String
+    """The name of a database to retrieve tables from."""
+    dbName: String!
+    """Limit on the number of tables to be returned."""
+    limit: Int
+    """The project name."""
+    project: String!
+  ): DataWithCursorRawDBTable
+  """
+  Receive event by ID
+  
+  Equivalent to GET /api/v1/projects/{project}/events/{id}
+  """
+  event(
+    id: Float!
+    """The project name."""
+    project: String!
+  ): Event
+  """
+  List events optionally filtered on query parameters
+  
+  Equivalent to GET /api/v1/projects/{project}/events
+  """
+  eventWithCursorResponse(
+    """Asset external IDs of equipment that this event relates to. Takes 1..100 unique items."""
+    assetExternalIds: String
+    """Asset IDs of equipment that this event relates to. Format is list of IDs serialized as JSON array(int64). Takes [ 1 .. 100 ] of unique items."""
+    assetIds: String
+    """Only include events that have a related asset in a subtree rooted at any of these assetExternalIds (including the roots given). If the total size of the given subtrees exceeds 100,000 assets, an error will be returned."""
+    assetSubtreeExternalIds: String
+    """Only include events that have a related asset in a subtree rooted at any of these assetIds (including the roots given). If the total size of the given subtrees exceeds 100,000 assets, an error will be returned."""
+    assetSubtreeIds: String
+    """Cursor for paging through results."""
+    cursor: String
+    externalIdPrefix: String
+    """Whether the metadata field should be returned, or not."""
+    includeMetadata: Boolean
+    """Limits the number of results to be returned. The maximum results returned by the server is 1000 even if you specify a higher limit."""
+    limit: Int
+    maxActiveAtTime: Int
+    maxCreatedTime: Float
+    maxEndTime: Float
+    maxLastUpdatedTime: Float
+    maxStartTime: Float
+    minActiveAtTime: Int
+    minCreatedTime: Float
+    minEndTime: Float
+    minLastUpdatedTime: Float
+    minStartTime: Float
+    """
+    Splits the data set into N partitions.
+    You need to follow the cursors within each partition in order to receive all the data.
+    Example: 1/10
+    
+    """
+    partition: String
+    """The project name."""
+    project: String!
+    """This parameter is deprecated. Use assetSubtreeIds instead. Only include events that have a related asset in a tree rooted at any of these root assetIds."""
+    rootAssetIds: String
+    """
+    Sort by array of selected fields. Syntax: `["<fieldname>:asc|desc"]`. Default sort order is `asc` with short syntax: `["<fieldname>"]`.
+    Filter accepts the following field names: startTime, endTime, createdTime, lastUpdatedTime.
+    Partitions are done independently of sorting, there is no guarantee on sort order between elements from different partitions.
+    
+    """
+    sort: [String]
+    source: String
+    subtype: String
+    type: String
+  ): EventWithCursorResponse
+  """
+  Retrieve an extraction pipeline by its ID. If you want to retrieve extraction pipelines by externalIds, use Retrieve extraction pipelines instead.
+  
+  Equivalent to GET /api/v1/projects/{project}/extpipes/{id}
+  """
+  extPipe(
+    id: Float!
+    """The project name."""
+    project: String!
+  ): ExtPipe
+  """
+  Returns a list of all extraction pipelines for a given project
+  
+  Equivalent to GET /api/v1/projects/{project}/extpipes
+  """
+  extPipes(
+    """Cursor for paging through results."""
+    cursor: String
+    """Limits the number of results to be returned. The maximum results returned by the server is 1000 even if you specify a higher limit."""
+    limit: Int
+    """The project name."""
+    project: String!
+  ): ExtPipes
+  """
+  Returns file info for the file ID
+  
+  Equivalent to GET /api/v1/projects/{project}/files/{id}
+  """
+  filesMetadata(
+    id: Float!
+    """The project name."""
+    project: String!
+  ): FilesMetadata
+  """
+  Retrieves a list of ancestor nodes of a given node, including itself, in the hierarchy of the 3D model. This operation supports pagination.
+  
+  Equivalent to GET /api/v1/projects/{project}/3d/models/{modelId}/revisions/{revisionId}/nodes/{nodeId}/ancestors
+  """
+  get3DNodeAncestors(
+    """Cursor for paging through results."""
+    cursor: String
+    """Limits the number of results to be returned. The maximum results returned by the server is 1000 even if you specify a higher limit."""
+    limit: Int
+    """Model ID."""
+    modelId: Float!
+    """ID of the node to get the ancestors of."""
+    nodeId: Float!
+    """The project name."""
+    project: String!
+    """Revision ID."""
+    revisionId: Float!
+  ): Node3DWithCursorResponse
+  """
+  List of all extraction pipeline runs for a given extraction pipeline. Sorted by createdTime value with descendant order.
+  
+  Equivalent to GET /api/v1/projects/{project}/extpipes/runs
+  """
+  itemsResponseExtPipeRunResponse(
+    """Cursor for paging through results."""
+    cursor: String
+    externalId: String!
+    """Limits the number of results to be returned. The maximum results returned by the server is 1000 even if you specify a higher limit."""
+    limit: Int
+    """The project name."""
+    project: String!
+  ): ItemsResponseExtPipeRunResponse
+  """
+  Retrieve a 3D model
+  
+  Equivalent to GET /api/v1/projects/{project}/3d/models/{modelId}
+  """
+  model3D(
+    """Model ID."""
+    modelId: Float!
+    """The project name."""
+    project: String!
+  ): Model3D
+  """
+  Retrieve a list of available outputs for a processed 3D model. An output can be a format that can be consumed by a viewer (e.g. Reveal) or import in external tools. Each of the outputs will have an associated version which is used to identify the version of output format (not the revision of the processed output). Note that the structure of the outputs will vary and is not covered here.
+  
+  Equivalent to GET /api/v1/projects/{project}/3d/models/{modelId}/revisions/{revisionId}/outputs
+  """
+  model3DOutputResponseList(
+    """
+    Format identifier, e.g. 'ept-pointcloud' (point cloud). Well known formats are: 
+    'ept-pointcloud' (point cloud data), 'reveal-directory' (output supported by Reveal), 
+    'nodes-json' (a JSON dump of all nodes in the file) and 'preview-glb' (a GLTF preview
+    of the 3D model). In addition, 'all-outputs' can be provided to return all outputs. Note
+    that many of the outputs are internal, where the format might change without any warning.
+    
+    """
+    format: String
+    """Model ID."""
+    modelId: Float!
+    """The project name."""
+    project: String!
+    """Revision ID."""
+    revisionId: Float!
+  ): Model3DOutputResponseList
+  """
+  Retrieves a list of all models in a project. This operation supports pagination. You can filter out all models without a published revision.
+  
+  Equivalent to GET /api/v1/projects/{project}/3d/models
+  """
+  model3DWithCursorResponse(
+    """Cursor for paging through results."""
+    cursor: String
+    """Limits the number of results to be returned. The maximum results returned by the server is 1000 even if you specify a higher limit."""
+    limit: Int
+    """The project name."""
+    project: String!
+    """Filter based on whether or not it has published revisions."""
+    published: Boolean
+  ): Model3DWithCursorResponse
+  """
+  Retrieves a list of nodes from the hierarchy in the 3D model. You can also request a specific subtree with the 'nodeId' query parameter and limit the depth of the resulting subtree with the 'depth' query parameter. By default, nodes are returned in order of ascending treeIndex. We suggest trying to set the query parameter `sortByNodeId` to `true` to check whether it makes your use case faster. The `partition` parameter can only be used if `sortByNodeId` is set to `true`. This operation supports pagination.
+  
+  Equivalent to GET /api/v1/projects/{project}/3d/models/{modelId}/revisions/{revisionId}/nodes
+  """
+  node3DWithCursorResponse(
+    """Cursor for paging through results."""
+    cursor: String
+    """Get sub nodes up to this many levels below the specified node. Depth 0 is the root node."""
+    depth: Int
+    """Limits the number of results to be returned. The maximum results returned by the server is 1000 even if you specify a higher limit."""
+    limit: Int
+    """Model ID."""
+    modelId: Float!
+    """ID of a node that are the root of the subtree you request (default is the root node)."""
+    nodeId: Float
+    """
+    Splits the data set into N partitions.
+    You need to follow the cursors within each partition in order to receive all the data.
+    Example: 1/10
+    
+    """
+    partition: String
+    """The project name."""
+    project: String!
+    """
+    Example: `{"category1":{"property1":"value1"}}`
+    
+    Filter for node properties. Only nodes that match all the given properties exactly will be listed.
+    The filter must be a JSON object with the same format as the `properties` field.
+    
+    """
+    properties: String
+    """Revision ID."""
+    revisionId: Float!
+    """Enable sorting by nodeId. When this parameter is `true`, nodes will be listed in order of ascending nodeId. Enabling this option will likely result in faster response for many requests."""
+    sortByNodeId: Boolean
+  ): Node3DWithCursorResponse
+  """
+  Lists all relationships. The order of retrieved objects may change for two calls with the same parameters.
+  The endpoint supports pagination. The initial call to this endpoint should not contain a cursor, but the cursor parameter should be used to retrieve further pages of results.
+  
+  Equivalent to GET /api/v1/projects/{project}/relationships
+  """
+  pagedRelationshipResponseWrapper(
+    """Cursor for paging through results."""
+    cursor: String
+    """Limits the number of results to be returned. The maximum results returned by the server is 1000 even if you specify a higher limit."""
+    limit: Int
+    """
+    Splits the data set into N partitions.
+    You need to follow the cursors within each partition in order to receive all the data.
+    Example: 1/10
+    
+    """
+    partition: String
+    """The project name."""
+    project: String!
+  ): PagedRelationshipResponseWrapper
+  """
+  Retrieve row by key
+  
+  Equivalent to GET /api/v1/projects/{project}/raw/dbs/{dbName}/tables/{tableName}/rows/{rowKey}
+  """
+  rawDBRow(
+    """Name of the database to retrieve the row from."""
+    dbName: String!
+    """The project name."""
+    project: String!
+    """Row key of the row to retrieve."""
+    rowKey: String!
+    """Name of the table to retrieve the row from."""
+    tableName: String!
+  ): RawDBRow
+  """
+  Retrieve a 3D revision
+  
+  Equivalent to GET /api/v1/projects/{project}/3d/models/{modelId}/revisions/{revisionId}
+  """
+  revision3D(
+    """Model ID."""
+    modelId: Float!
+    """The project name."""
+    project: String!
+    """Revision ID."""
+    revisionId: Float!
+  ): Revision3D
+  """
+  Retrieves a list of all revisions of a model. This operation supports pagination. You can also filter revisions if they are marked as published or not by using the query param published.
+  
+  Equivalent to GET /api/v1/projects/{project}/3d/models/{modelId}/revisions
+  """
+  revision3DWithCursorResponse(
+    """Cursor for paging through results."""
+    cursor: String
+    """Limits the number of results to be returned. The maximum results returned by the server is 1000 even if you specify a higher limit."""
+    limit: Int
+    """Model ID."""
+    modelId: Float!
+    """The project name."""
+    project: String!
+    """Filter based on published status."""
+    published: Boolean
+  ): Revision3DWithCursorResponse
+  """
+  List log entries for the revision
+  
+  Equivalent to GET /api/v1/projects/{project}/3d/models/{modelId}/revisions/{revisionId}/logs
+  """
+  revisionLog3DResponse(
+    """Model ID."""
+    modelId: Float!
+    """The project name."""
+    project: String!
+    """Revision ID."""
+    revisionId: Float!
+    severity: Float
+  ): RevisionLog3DResponse
+  """
+  Retrieves a list of all security categories for a project.
+  
+  Equivalent to GET /api/v1/projects/{project}/securitycategories
+  """
+  securityCategoryWithCursorResponse(
+    """Cursor to use for paging through results."""
+    cursor: String
+    """Return up to this many results. Maximum is 1000. Default is 25."""
+    limit: Int
+    """The project name."""
+    project: String!
+    """Sort descending or ascending."""
+    sort: Sort2
+  ): SecurityCategoryWithCursorResponse
+  """
+  List sequences. Use nextCursor to paginate through the results.
+  
+  Equivalent to GET /api/v1/projects/{project}/sequences
+  """
+  sequenceWithCursorResponse(
+    """Cursor for paging through results."""
+    cursor: String
+    """Limits the number of results to be returned. The maximum results returned by the server is 1000 even if you specify a higher limit."""
+    limit: Int
+    """
+    Splits the data set into N partitions.
+    You need to follow the cursors within each partition in order to receive all the data.
+    Example: 1/10
+    
+    """
+    partition: String
+    """The project name."""
+    project: String!
+  ): SequenceWithCursorResponse
+}
+
+type ApiV1ProjectContextDiagramConvert3 {
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  createdTime: Float!
+  """Return the SVG version in grayscale colors only (reduces the file size)."""
+  grayscale: Boolean
+  """An array of converted results, returned when the job finished or failed partially."""
+  items: [JSON]
+  """Contextualization job ID."""
+  jobId: Float!
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  startTime: Float!
+  """The status of the job."""
+  status: JobStatus!
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  statusTime: Float!
+}
+
+"""The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf)."""
+scalar JSON @specifiedBy(url: "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf")
+
+enum JobStatus {
+  QUEUED
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+type ApiV1ProjectContextDiagramDetect3 {
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  createdTime: Float!
+  """An array of detected results, returned when the job finished or failed partially."""
+  items: [JSON]
+  """Contextualization job ID."""
+  jobId: Float!
+  """Each detected item must match the detected entity on at least this number of tokens. A token is a substring of consecutive letters or digits."""
+  minTokens: Int
+  """Allow partial (fuzzy) matching of entities in the engineering diagrams. Creates a match only when it is possible to do so unambiguously."""
+  partialMatch: Boolean
+  """This field determines the string to search for and to identify object entities."""
+  searchField: String
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  startTime: Float!
+  """The status of the job."""
+  status: JobStatus!
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  statusTime: Float!
+}
+
+type ApiV1ProjectContextEntitymatching {
+  items: [EntityMatcherResponseSchema]!
+}
+
+type EntityMatcherResponseSchema {
+  """Name of the classifier used in the model, "Unsupervised" if unsupervised model."""
+  classifier: String
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  createdTime: Float!
+  """User defined description."""
+  description: String!
+  """The external ID provided by the client. Must be unique for the resource type."""
+  externalId: String!
+  """Each feature type defines the combination of features that will be created and used in the entity matcher model."""
+  featureType: FeatureType
+  """A server-generated ID for the object."""
+  id: Float!
+  """If True, missing fields in `sources` or `targets` entities set in `matchFields`, are replaced with empty strings."""
+  ignoreMissingFields: Boolean
+  """List of pairs of fields from the target and source items used to calculate features. All source and target items should have all the `source` and `target` fields specified here."""
+  matchFields: [MatchFieldsListItem]
+  """User defined name."""
+  name: String!
+  """The ID of original model, only relevant when the model is a retrained model."""
+  originalId: Int
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  startTime: Float!
+  """The status of the job."""
+  status: JobStatus!
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  statusTime: Float!
+}
+
+enum FeatureType {
+  SIMPLE
+  INSENSITIVE
+  BIGRAM
+  FREQUENCYWEIGHTEDBIGRAM
+  BIGRAMEXTRATOKENIZERS
+  BIGRAMCOMBO
+}
+
+type MatchFieldsListItem {
+  source: String!
+  target: String!
+}
+
+type ApiV1ProjectContextEntitymatching3 {
+  """Name of the classifier used in the model, "Unsupervised" if unsupervised model."""
+  classifier: String!
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  createdTime: Float!
+  """User defined description."""
+  description: String!
+  """The external ID provided by the client. Must be unique for the resource type."""
+  externalId: String!
+  """Each feature type defines the combination of features that will be created and used in the entity matcher model."""
+  featureType: FeatureType!
+  """A server-generated ID for the object."""
+  id: Float!
+  """If True, missing fields in `sources` or `targets` entities set in `matchFields`, are replaced with empty strings."""
+  ignoreMissingFields: Boolean
+  """List of pairs of fields from the target and source items used to calculate features. All source and target items should have all the `source` and `target` fields specified here."""
+  matchFields: [MatchFieldsListItem]
+  """User defined name."""
+  name: String!
+  """The ID of original model, only relevant when the model is a retrained model."""
+  originalId: Int
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  startTime: Float!
+  """The status of the job."""
+  status: JobStatus!
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  statusTime: Float!
+}
+
+type ApiV1ProjectContextEntitymatchingJob {
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  createdTime: Float!
+  """List of matched entities with confidence score."""
+  items: [Items75ListItem]!
+  """Contextualization job ID."""
+  jobId: Float!
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  startTime: Float!
+  """The status of the job."""
+  status: JobStatus!
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  statusTime: Float!
+}
+
+type Items75ListItem {
+  """Matched items, sorted from highest score to lowest. May be empty."""
+  matches: [MatchesListItem]!
+  """The source item given to predict."""
+  source: JSON!
+}
+
+type MatchesListItem {
+  """The model's confidence in the match."""
+  score: Float
+  """The target item given to predict."""
+  target: JSON
+}
+
+type Asset {
+  """Aggregated metrics of the asset"""
+  aggregates: AggregateResultItem
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  createdTime: Float!
+  """The id of the dataset this asset belongs to."""
+  dataSetId: Int
+  """The description of the asset."""
+  description: String
+  """The external ID provided by the client. Must be unique for the resource type."""
+  externalId: String
+  """A server-generated ID for the object."""
+  id: Float!
+  """A list of the labels associated with this resource item."""
+  labels: [Label]
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  lastUpdatedTime: Float!
+  """Custom, application specific metadata. String key -> String value. Limits: Maximum length of key is 128 bytes, value 10240 bytes, up to 256 key-value pairs, of total size at most 10240."""
+  metadata: JSON
+  """The name of the asset."""
+  name: String!
+  """
+  The parent node's external ID used to specify the parent-child relationship.
+  When specifying this field, the API will resolve the external ID into an internal ID and use the internal ID to store the parent-child relation.
+  As a result, a later change to update the parent's external ID will not affect this parent-child relationship as it is based on internal ID.
+  
+  You should not use this field in combination with the parentId field.
+  
+  """
+  parentExternalId: String
+  """
+  The parent node's ID used to specify parent-child relationship.
+  
+  You should not use this field in combination with the parentExternalId field.
+  
+  """
+  parentId: Int
+  """The ID of the root asset. The root asset is the asset spanning the entire asset hierarchy that this asset belongs to."""
+  rootId: Int!
+  """The source of the asset."""
+  source: String
+}
+
+"""Aggregated metrics of the asset"""
+type AggregateResultItem {
+  """Number of direct descendants for the asset"""
+  childCount: Int
+  """Asset path depth (number of levels below root node)."""
+  depth: Int
+  """IDs of assets on the path to the asset."""
+  path: [AssetIdentifier]
+}
+
+type AssetIdentifier {
+  """A server-generated ID for the object."""
+  id: Float!
+}
+
+"""A label assigned to a resource."""
+type Label {
+  """An external ID to a predefined label definition."""
+  externalId: String!
+}
+
+type AssetMapping3DWithCursorResponse {
+  items: [AssetMapping3D]!
+  """Cursor to get the next page of results (if available)."""
+  nextCursor: String
+}
+
+type AssetMapping3D {
+  """The ID of the associated asset (Cognite's Assets API)."""
+  assetId: Float!
+  """The ID of the node."""
+  nodeId: Float!
+  """The number of nodes in the subtree of this node (this number included the node itself)."""
+  subtreeSize: Float!
+  """A number describing the position of this node in the 3D hierarchy, starting from 0. The tree is traversed in a depth-first order."""
+  treeIndex: Float!
+}
+
+"""A list of cursors"""
+type DataRawDBTableCursors {
+  items: [String]
+}
+
+"""A list of objects along with possible cursors to get the next page of results"""
+type DataWithCursor {
+  items: [FilesMetadata]
+  """Cursor to get the next page of results (if available)."""
+  nextCursor: String
+}
+
+type FilesMetadata {
+  assetIds: [Float]
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  createdTime: Float!
+  """The dataSet Id for the item."""
+  dataSetId: Float
+  """Directory containing the file. Must be an absolute, unix-style path."""
+  directory: String
+  """The external ID provided by the client. Must be unique for the resource type."""
+  externalId: String
+  """The geographic metadata of the file."""
+  geoLocation: GeoLocation
+  """A server-generated ID for the object."""
+  id: Float!
+  """A list of the labels associated with this resource item."""
+  labels: [Label]
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  lastUpdatedTime: Float!
+  """Custom, application specific metadata. String key -> String value. Limits: Maximum length of key is 128 bytes, value 10240 bytes, up to 256 key-value pairs, of total size at most 10240."""
+  metadata: JSON
+  """File type. E.g. text/plain, application/pdf, .."""
+  mimeType: String
+  """Name of the file."""
+  name: String!
+  """The security category IDs required to access this file."""
+  securityCategories: [Float]
+  """The source of the file."""
+  source: String
+  sourceCreatedTime: Int
+  sourceModifiedTime: Int
+  """Whether or not the actual file is uploaded.  This field is returned only by the API, it has no effect in a post body."""
+  uploaded: Boolean!
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  uploadedTime: Float
+}
+
+"""The geographic metadata of the file."""
+type GeoLocation {
+  """Represents the points, curves and surfaces in the coordinate space."""
+  geometry: JSON!
+  """Additional properties in a String key -> Object value format."""
+  properties: JSON
+  """One of the GeoJSON types. Currently only the 'Feature' type is supported."""
+  type: Type!
+}
+
+enum Type {
+  FEATURE
+}
+
+"""A list of objects along with possible cursors to get the next or previous page of results."""
+type DataWithCursorAsset {
+  items: [Asset]!
+  """The cursor to get the next page of results (if available)."""
+  nextCursor: String
+}
+
+"""A list of objects along with possible cursors to get the next page of result"""
+type DataWithCursorGetTimeSeriesMetadataDTO {
+  items: [GetTimeSeriesMetadataDTO]!
+  """The cursor to get the next page of results (if available)."""
+  nextCursor: String
+}
+
+type GetTimeSeriesMetadataDTO {
+  """Asset ID of equipment linked to this time series."""
+  assetId: Int
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  createdTime: Float!
+  """The dataSet Id for the item."""
+  dataSetId: Float
+  """Description of the time series."""
+  description: String
+  """The externally supplied ID for the time series."""
+  externalId: String
+  """A server-generated ID for the object."""
+  id: Float!
+  """Whether the time series is a step series or not."""
+  isStep: Boolean!
+  """Whether the time series is string valued or not."""
+  isString: Boolean!
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  lastUpdatedTime: Float!
+  """Custom, application specific metadata. String key -> String value. Limits: Maximum length of key is 128 bytes, up to 256 key-value pairs, of total size of at most 10000 bytes across all keys and values."""
+  metadata: JSON
+  """The display short name of the time series. Note: Value of this field can differ from name presented by older versions of API 0.3-0.6."""
+  name: String
+  """The required security categories to access this time series."""
+  securityCategories: [Float]
+  """The physical unit of the time series."""
+  unit: String
+}
+
+"""A list of objects along with possible cursors to get the next, or previous, page of results"""
+type DataWithCursorRawDB {
+  items: [RawDB]
+  """Cursor to get the next page of results (if available)."""
+  nextCursor: String
+}
+
+"""A NoSQL database to store customer data."""
+type RawDB {
+  """Unique name of a database."""
+  name: String!
+}
+
+"""A list of objects along with possible cursors to get the next, or previous, page of results"""
+type DataWithCursorRawDBRow {
+  items: [RawDBRow]
+  """Cursor to get the next page of results (if available)."""
+  nextCursor: String
+}
+
+type RawDBRow {
+  """Row data stored as a JSON object."""
+  columns: JSON!
+  """Unique row key"""
+  key: String!
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  lastUpdatedTime: Float!
+}
+
+"""A list of objects along with possible cursors to get the next, or previous, page of results"""
+type DataWithCursorRawDBTable {
+  items: [RawDBTable]
+  """Cursor to get the next page of results (if available)."""
+  nextCursor: String
+}
+
+"""A NoSQL database table to store customer data"""
+type RawDBTable {
+  """Unique name of the table"""
+  name: String!
+}
+
+type Event {
+  """Asset IDs of equipment that this event relates to."""
+  assetIds: [Float]
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  createdTime: Float!
+  """The id of the dataset this event belongs to."""
+  dataSetId: Int
+  """Textual description of the event."""
+  description: String
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  endTime: Float
+  """The external ID provided by the client. Must be unique for the resource type."""
+  externalId: String
+  """A server-generated ID for the object."""
+  id: Float!
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  lastUpdatedTime: Float!
+  """Custom, application specific metadata. String key -> String value. Limits: Maximum length of key is 128 bytes, value 128000 bytes, up to 256 key-value pairs, of total size at most 200000."""
+  metadata: JSON
+  """The source of this event."""
+  source: String
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  startTime: Float
+  """SubType of the event, e.g 'electrical'."""
+  subtype: String
+}
+
+type EventWithCursorResponse {
+  items: [Event]!
+  """Cursor to get the next page of results (if available)."""
+  nextCursor: String
+}
+
+type ExtPipe {
+  """Contacts list."""
+  contacts: [Contact]
+  """Extraction Pipeline creator. Usually user email is expected here"""
+  createdBy: String
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  createdTime: Float
+  """DataSet ID"""
+  dataSetId: Float!
+  """Description of Extraction Pipeline"""
+  description: String
+  """Documentation text field, supports Markdown for text formatting."""
+  documentation: String
+  """External Id provided by client. Should be unique within the project."""
+  externalId: String!
+  """A server-generated ID for the object."""
+  id: Float
+  """Time of last failure run. The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  lastFailure: Float
+  """Last failure message."""
+  lastMessage: String
+  """Last seen time. The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  lastSeen: Float
+  """Time of last successful run. The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  lastSuccess: Float
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  lastUpdatedTime: Float
+  """Custom, application specific metadata. String key -> String value. Limits: Key are at most 128 bytes. Values are at most 10240 bytes. Up to 256 key-value pairs. Total size is at most 10240."""
+  metadata: JSON
+  """Name of Extraction Pipeline"""
+  name: String!
+  """Raw tables"""
+  rawTables: [RawTable]
+  """Possible values: “On trigger”, “Continuous” or cron expression. If empty then null"""
+  schedule: String
+  """Source for Extraction Pipeline"""
+  source: String
+}
+
+type Contact {
+  """Contact email"""
+  email: String
+  """Contact name"""
+  name: String
+  """Contact role"""
+  role: String
+  """True, if contact receives email notifications"""
+  sendNotification: Boolean
+}
+
+type RawTable {
+  """Database name"""
+  dbName: String!
+  """Table name"""
+  tableName: String!
+}
+
+"""List of extraction pipelines"""
+type ExtPipes {
+  items: [ExtPipe]
+}
+
+type Node3DWithCursorResponse {
+  items: [Node3D]!
+  """Cursor to get the next page of results (if available)."""
+  nextCursor: String
+}
+
+type Node3D {
+  """The bounding box of the subtree with this sector as the root sector. Is null if there are no geometries in the subtree."""
+  boundingBox: BoundingBox3D
+  """The depth of the node in the tree, starting from 0 at the root node."""
+  depth: Float!
+  """The ID of the node."""
+  id: Float!
+  """The name of the node."""
+  name: String!
+  """The parent of the node, null if it is the root node."""
+  parentId: Float
+  """Properties extracted from 3D model, with property categories containing key/value string pairs."""
+  properties: JSON
+  """The number of descendants of the node, plus one (counting itself)."""
+  subtreeSize: Float!
+  """The index of the node in the 3D model hierarchy, starting from 0. The tree is traversed in a depth-first order."""
+  treeIndex: Float!
+}
+
+"""The bounding box of the subtree with this sector as the root sector. Is null if there are no geometries in the subtree."""
+type BoundingBox3D {
+  max: [Float]!
+  min: [Float]!
+}
+
+"""Response with a list of elements."""
+type ItemsResponseExtPipeRunResponse {
+  items: [ExtPipeRunResponse]
+  """The cursor to get the next page of results (if available)."""
+  nextCursor: String
+}
+
+"""Extraction Pipeline Run. Contains extraction pipeline status and message for a moment of time"""
+type ExtPipeRunResponse {
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  createdTime: Float
+  """A server-generated ID for the object."""
+  id: Float
+  """Error message."""
+  message: String
+  """Extraction Pipeline status."""
+  status: String!
+}
+
+type Model3D {
+  """The creation time of the resource, in milliseconds since January 1, 1970 at 00:00 UTC."""
+  createdTime: Float!
+  """The dataSet Id for the item."""
+  dataSetId: Float
+  """The ID of the model."""
+  id: Float!
+  """Custom, application specific metadata. String key -> String value. Limits: Maximum length of key is 32 bytes, value 512 bytes, up to 16 key-value pairs."""
+  metadata: JSON
+  """The name of the model."""
+  name: String!
+}
+
+type Model3DOutputResponseList {
+  """A list of named and versioned outputs for the model. Note that the list is not sorted."""
+  items: [Items27ListItem]!
+}
+
+type Items27ListItem {
+  """Reference to 3D file containing output. 3D file can either be a single file or folder. Use `/3d/files/{id}`."""
+  blobId: Int!
+  """Format identifier."""
+  format: String!
+  """Version of the output format, starting at 1."""
+  version: Int!
+}
+
+type Model3DWithCursorResponse {
+  items: [Model3D]!
+  """Cursor to get the next page of results (if available)."""
+  nextCursor: String
+}
+
+type PagedRelationshipResponseWrapper {
+  items: [RelationshipResponse]!
+  """The cursor to get the next page of results (if available)."""
+  nextCursor: String
+}
+
+type RelationshipResponse {
+  """Confidence value of the existence of the relationship. Generated relationships provide a score of the likelihood of the relationship existing. Relationships without a confidence value can be interpreted at the discretion of each project."""
+  confidence: Float
+  """The time, in milliseconds since Jan. 1, 1970, when the relationship was created."""
+  createdTime: Int!
+  """The ID of the dataset the relationship belongs to."""
+  dataSetId: Int
+  """The time, in milliseconds since Jan. 1, 1970, when the relationship became inactive. If there is no endTime, the relationship is active from startTime until the present or any point in the future. If endTime and startTime are set, the endTime must be greater than startTime."""
+  endTime: Int
+  """The external ID of the relationship."""
+  externalId: String!
+  """A list of the labels associated with this resource item."""
+  labels: [Label]
+  """The time, in milliseconds since Jan. 1, 1970, when the relationship was last updated."""
+  lastUpdatedTime: Int!
+  """The external ID of the resource that is the relationship source."""
+  sourceExternalId: String!
+  """The resource type of the relationship source. Must be one of the specified values."""
+  sourceType: String!
+  """The time, in milliseconds since Jan. 1, 1970, when the relationship became active. If there is no startTime, the relationship is active from the beginning of time until endTime."""
+  startTime: Int
+  """The external ID of the resource that is the relationship target."""
+  targetExternalId: String!
+  """The resource type of the relationship target. Must be one of the specified values."""
+  targetType: String!
+}
+
+type Revision3D {
+  """The number of asset mappings for this revision."""
+  assetMappingCount: Float!
+  """Initial camera position and target."""
+  camera: RevisionCameraProperties
+  """The creation time of the resource, in milliseconds since January 1, 1970 at 00:00 UTC."""
+  createdTime: Float!
+  """The file id."""
+  fileId: Float!
+  """The ID of the revision."""
+  id: Float!
+  """Custom, application specific metadata. String key -> String value. Limits: Maximum length of key is 32 bytes, value 512 bytes, up to 16 key-value pairs."""
+  metadata: JSON
+  """True if the revision is marked as published."""
+  published: Boolean!
+  rotation: [Float]
+  """The status of the revision."""
+  status: Status!
+  """The threed file ID of a thumbnail for the revision. Use `/3d/files/{id}` to retrieve the file."""
+  thumbnailThreedFileId: Float
+  """The URL of a thumbnail for the revision."""
+  thumbnailURL: String
+}
+
+"""Initial camera position and target."""
+type RevisionCameraProperties {
+  """Initial camera position."""
+  position: [Float]
+  """Initial camera target."""
+  target: [Float]
+}
+
+enum Status {
+  QUEUED
+  PROCESSING
+  DONE
+  FAILED
+}
+
+type Revision3DWithCursorResponse {
+  items: [Revision3D]!
+  """Cursor to get the next page of results (if available)."""
+  nextCursor: String
+}
+
+type RevisionLog3DResponse {
+  items: [RevisionLog3D]!
+}
+
+type RevisionLog3D {
+  """Optional extra information related to the log entry"""
+  info: String
+  """How severe is the message (3 = INFO, 5 = WARN, 7 = ERROR)."""
+  severity: Int!
+  """The creation time of the resource, in milliseconds since January 1, 1970 at 00:00 UTC."""
+  timestamp: Float!
+  """Main computer parsable log entry type"""
+  type: String!
+}
+
+"""A list of objects along with possible cursors to get the next page of results"""
+type SecurityCategoryWithCursorResponse {
+  items: [SecurityCategoryDTO]!
+  """Cursor to get the next page of results (if available)."""
+  nextCursor: String
+}
+
+type SecurityCategoryDTO {
+  """ID of the security category"""
+  id: Float!
+  """Name of the security category"""
+  name: String!
+}
+
+enum Sort2 {
+  ASC
+  DESC
+}
+
+type SequenceWithCursorResponse {
+  items: [GetSequenceDTO]!
+  """The cursor to get the next page of results (if available). Learn more [here](/dev/concepts/pagination/)."""
+  nextCursor: String
+}
+
+"""Information about the sequence stored in the database"""
+type GetSequenceDTO {
+  """Optional asset this sequence is associated with"""
+  assetId: Float
+  """List of column definitions"""
+  columns: [GetSequenceColumnDTO]!
+  """Time when this sequence was created in CDF in milliseconds since Jan 1, 1970."""
+  createdTime: Float!
+  """Data set that this sequence belongs to"""
+  dataSetId: Float
+  """Description of the sequence"""
+  description: String
+  """The external ID provided by the client. Must be unique for the resource type."""
+  externalId: String
+  """Unique cognite-provided identifier for the sequence"""
+  id: Float!
+  """The last time this sequence was updated in CDF, in milliseconds since Jan 1, 1970."""
+  lastUpdatedTime: Float!
+  """Custom, application specific metadata. String key -> String value. Limits: Maximum length of key is 128 bytes, up to 256 key-value pairs, up to a total size of 10000 bytes across all keys and values."""
+  metadata: JSON
+  """Name of the sequence"""
+  name: String
+}
+
+"""Information about a column stored in the database"""
+type GetSequenceColumnDTO {
+  """Time when this asset was created in CDF in milliseconds since Jan 1, 1970."""
+  createdTime: Float!
+  """Description of the column"""
+  description: String
+  """User provided column identifier (Unique for a given sequence)"""
+  externalId: String
+  """The last time this asset was updated in CDF, in milliseconds since Jan 1, 1970."""
+  lastUpdatedTime: Float!
+  """Custom, application specific metadata. String key -> String value"""
+  metadata: JSON
+  """Human readable name of the column"""
+  name: String
+  """What type the datapoints in a column will have. DOUBLE is restricted to the range [-1E100, 1E100]"""
+  valueType: SequenceValueTypeEnum!
+}
+
+enum SequenceValueTypeEnum {
+  STRING
+  DOUBLE
+  LONG
+}
+
+type Mutation {
+  """
+  Retrieve a list of all events in the same project. This operation supports pagination by cursor. Criteria can be applied to select a subset of events.
+  
+  Equivalent to POST /api/v1/projects/{project}/events/list
+  """
+  advancedListEvents(
+    """Filter request for events. Filters exact field matching or timestamp ranges inclusive min and max."""
+    eventFilterRequestInput: EventFilterRequestInput
+    """The project name."""
+    project: String!
+  ): EventWithCursorResponse
+  """
+  Retrieves a list of all files in a project. Criteria can be supplied to select a subset of files. This operation supports pagination with cursors.
+  
+  Equivalent to POST /api/v1/projects/{project}/files/list
+  """
+  advancedListFiles(
+    fileFilterRequestInput: FileFilterRequestInput!
+    """The project name."""
+    project: String!
+  ): DataWithCursor
+  """
+  Retrieves a list of sequences matching the given criteria.
+  
+  Equivalent to POST /api/v1/projects/{project}/sequences/list
+  """
+  advancedListSequences(
+    """The project name."""
+    project: String!
+    sequencesAdvancedListDTOInput: SequencesAdvancedListDTOInput
+  ): SequenceWithCursorResponse
+  """
+  Use advanced filtering options to agggregate assets.
+  
+  Equivalent to POST /api/v1/projects/{project}/assets/aggregate
+  """
+  aggregateAssets(
+    """Aggregation request of assets. Filters behave the same way as for the `list` endpoint. Default aggregation is `count`."""
+    assetAggregateRequestInput: AssetAggregateRequestInput
+    """The project name."""
+    project: String!
+  ): DataAssetAggregate
+  """
+  Aggregate data sets in the same project. Criteria can be applied to select a subset of data sets.
+  
+  Equivalent to POST /api/v1/projects/{project}/datasets/aggregate
+  """
+  aggregateDataSets(
+    """Aggregation request of data sets. Filters exact field matching or timestamp ranges inclusive min and max."""
+    dataSetAggregateRequestInput: DataSetAggregateRequestInput
+    """The project name."""
+    project: String!
+  ): DataDataSetAggregate
+  """
+  The aggregation API allows you to compute aggregated results on events 
+  like getting the count of all events in a project or checking what are all the 
+  different types and subtypes of events in your project, along with 
+  the count of events in each of those aggregations. By specifying an additional 
+  filter, you can also aggregate only among events matching the specified filter.
+  
+  The default behavior, when you do not specify 
+  the `aggregate` field in the request body, is to return the count 
+  of events.
+  
+  Setting `aggregate` to `uniqueValues` will return all unique values (up to a 
+  maximum of 1000) and the count of each in the field specified in 
+  `fields: []`. Note that, currently, you can only request for unique 
+  values on a single field. Also, in the case of text fields, the values are 
+  aggregated in a case-insensitive manner. For example:
+  
+  ```
+  {
+    "aggregate": "uniqueValues",
+    "fields": [ "type" ]
+  }
+  ```
+  
+  will return all unique 'types' in the events in your project.
+  
+  Similarly,
+  
+  ```
+  {
+    "aggregate": "uniqueValues",
+    "fields": [ "dataSetId" ],
+    "filter": {
+      "subType": "subtype_1"
+    }
+  }
+  ```
+  will return all unique dataSetIds in events of subtype 'subtype_1'
+  
+  
+  Equivalent to POST /api/v1/projects/{project}/events/aggregate
+  """
+  aggregateEvents(
+    """Aggregation request of events. Filters exact field matching or timestamp ranges inclusive min and max. Default aggregation is `count`."""
+    eventAggregateRequestInput: JSON
+    """The project name."""
+    project: String!
+  ): AggregateResult
+  """
+  Calculate aggregates for files, based on optional filter specification. Returns the following aggregates: `count`
+  
+  Equivalent to POST /api/v1/projects/{project}/files/aggregate
+  """
+  aggregateFiles(
+    """Filter on files with exact match"""
+    fileFilterInput: FileFilterInput!
+    """The project name."""
+    project: String!
+  ): DataFilesAggregate
+  """
+  Count the number of sequences that match the given filter
+  
+  Equivalent to POST /api/v1/projects/{project}/sequences/aggregate
+  """
+  aggregateSequences(
+    """The project name."""
+    project: String!
+    sequencesAggregateDTOInput: SequencesAggregateDTOInput
+  ): SequenceAggregateResponse
+  """
+  Count the number of time series that match the given filter
+  
+  Equivalent to POST /api/v1/projects/{project}/timeseries/aggregate
+  """
+  aggregateTimeSeries(
+    """The project name."""
+    project: String!
+    timeSeriesAggregateDTOInput: TimeSeriesAggregateDTOInput
+  ): TimeSeriesAggregateResponse
+  """
+  Updates one or more time series. Fields that are not included in the request, are not changed.
+  
+  For primitive fields (String, Long Int), use 'set': 'value' to update the value; use 'setNull': true to set the field to null.
+  
+  For JSON Array fields (for example securityCategories), use 'set': [value1, value2] to update the value; use 'add': [v1, v2] to add values; use 'remove': [v1, v2] to remove values.
+  
+  Equivalent to POST /api/v1/projects/{project}/timeseries/update
+  """
+  alterTimeSeries(
+    """The project name."""
+    project: String!
+    timeSeriesUpdateRequestInput: TimeSeriesUpdateRequestInput!
+  ): DataGetTimeSeriesMetadataDTO
+  """
+  Retrieve assets by IDs or external IDs. If you specify to get aggregates then be aware that the aggregates are eventually consistent.
+  
+  
+  Equivalent to POST /api/v1/projects/{project}/assets/byids
+  """
+  byIdsAssets(
+    assetDataIdsInput: AssetDataIdsInput!
+    """The project name."""
+    project: String!
+  ): DataAsset
+  """
+  Retrieves information about events in the same project. Events are returned in the same order as the ids listed in the query.
+  
+  A maximum of 1000 event IDs may be listed per request and all of them must be unique.
+  
+  Equivalent to POST /api/v1/projects/{project}/events/byids
+  """
+  byIdsEvents(
+    eventDataIdsInput: EventDataIdsInput!
+    """The project name."""
+    project: String!
+  ): EventResponse
+  """
+  Retrieves metadata information about multiple specific files in the same project. 
+  Results are returned in the same order as in the request. This operation does not return the file contents.
+  
+  Equivalent to POST /api/v1/projects/{project}/files/byids
+  """
+  byIdsFiles(
+    fileDataIdsWithIgnoreUnknownIdsInput: FileDataIdsWithIgnoreUnknownIdsInput!
+    """The project name."""
+    project: String!
+  ): DataFileMetadata
+  """
+  Retrieves information about multiple extraction pipelines in the same project. All ids and externalIds must be unique.
+  
+  Equivalent to POST /api/v1/projects/{project}/extpipes/byids
+  """
+  byidsExtPipes(
+    extendedItemsRequestExtPipeIdInput: ExtendedItemsRequestExtPipeIdInput!
+    """The project name."""
+    project: String!
+  ): ExtPipes
+  """
+  Retrieve relationships by external IDs. You can retrieve a maximum of 1000 relationships per request.
+  The order of the relationships in the response equals the order in the request.
+  
+  Equivalent to POST /api/v1/projects/{project}/relationships/byids
+  """
+  byidsRelationships(
+    byIdsRequestInput: ByIdsRequestInput!
+    """The project name."""
+    project: String!
+  ): EnrichedRelationshipResponseWrapper
+  """
+  Create asset mappings
+  
+  
+  Asset references when creating a mapping - through asset ids - are allowed to be
+  invalid.
+  They are NOT maintained by any means from CDF, meaning they will be stored until the
+  reference is removed through the delete endpoint of 3d asset mappings.
+  
+  Equivalent to POST /api/v1/projects/{project}/3d/models/{modelId}/revisions/{revisionId}/mappings
+  """
+  create3DMappings(
+    apiV1Project3dModelRevisionMappingsInput: ApiV1Project3dModelRevisionMappingsInput!
+    """Model ID."""
+    modelId: Float!
+    """The project name."""
+    project: String!
+    """Revision ID."""
+    revisionId: Float!
+  ): AssetMapping3DList
+  """
+  Create 3D models
+  
+  Equivalent to POST /api/v1/projects/{project}/3d/models
+  """
+  create3DModels(
+    apiV1Project3dModelsInput: ApiV1Project3dModelsInput!
+    """The project name."""
+    project: String!
+  ): Model3DList
+  """
+  Create 3D revisions
+  
+  Equivalent to POST /api/v1/projects/{project}/3d/models/{modelId}/revisions
+  """
+  create3DRevisions(
+    apiV1Project3dModelRevisionsInput: ApiV1Project3dModelRevisionsInput
+    """Model ID."""
+    modelId: Float!
+    """The project name."""
+    project: String!
+  ): Revision3DList
+  """
+  You can create a maximum of 1000 assets per request.
+  
+  Equivalent to POST /api/v1/projects/{project}/assets
+  """
+  createAssets(
+    dataExternalAssetInput: DataExternalAssetInput!
+    """The project name."""
+    project: String!
+  ): DataAsset
+  """
+  Create databases in a project. It is possible to post a maximum of 1000 databases per request.
+  
+  Equivalent to POST /api/v1/projects/{project}/raw/dbs
+  """
+  createDBs(
+    dataRawDBInput: DataRawDBInput!
+    """The project name."""
+    project: String!
+  ): DataRawDB
+  """
+  You can create a maximum of 10 data sets per request.
+  
+  Equivalent to POST /api/v1/projects/{project}/datasets
+  """
+  createDataSets(
+    dataSetSpecListInput: DataSetSpecListInput!
+    """The project name."""
+    project: String!
+  ): DataSetList
+  """
+  Creates multiple event objects in the same project. It is possible to post a maximum of 1000 events per request.
+  
+  Equivalent to POST /api/v1/projects/{project}/events
+  """
+  createEvents(
+    dataExternalEventInput: DataExternalEventInput!
+    """The project name."""
+    project: String!
+  ): EventResponse
+  """
+  Creates multiple new extraction pipelines. A maximum of 1000 extraction pipelines can be created per request.
+  
+  Equivalent to POST /api/v1/projects/{project}/extpipes
+  """
+  createExtPipes(
+    itemsRequestCreateExtPipeInput: ItemsRequestCreateExtPipeInput!
+    """The project name."""
+    project: String!
+  ): ExtPipes
+  """
+  List of the relationships to create. You can create a maximum of 1000 relationships per request. Relationships should be unique, but CDF does not prevent you from creating duplicates where only the externalId differs.
+  
+  Relationships are uniquely identified by their externalId. Non-unique relationships will not be created.
+  
+  The order of relationships in the response equals the order in the request.
+  
+  Equivalent to POST /api/v1/projects/{project}/relationships
+  """
+  createRelationships(
+    """The project name."""
+    project: String!
+    relationshipRequestWrapperInput: RelationshipRequestWrapperInput!
+  ): RelationshipResponseWrapper
+  """
+  Create multiple extraction pipeline runs. Current version supports one extraction pipeline run per request. Extraction pipeline runs support three statuses: success, failure, seen. The content of the Error Message parameter is configurable and will contain any messages that have been configured within the extraction pipeline.
+  
+  Equivalent to POST /api/v1/projects/{project}/extpipes/runs
+  """
+  createRuns(
+    itemsRequestExtPipeRunRequestInput: ItemsRequestExtPipeRunRequestInput!
+    """The project name."""
+    project: String!
+  ): ItemsResponseCreateExtPipeRunResponse
+  """
+  Creates security categories with the given names. Duplicate names in the request are ignored.
+  If a security category with one of the provided names exists already, then the request will fail and no security categories are created.
+  
+  
+  Equivalent to POST /api/v1/projects/{project}/securitycategories
+  """
+  createSecurityCategories(
+    dataSecurityCategorySpecDTOInput: DataSecurityCategorySpecDTOInput!
+    """The project name."""
+    project: String!
+  ): SecurityCategoryResponse
+  """
+  Create one or more sequences.
+  
+  Equivalent to POST /api/v1/projects/{project}/sequences
+  """
+  createSequence(
+    dataPostSequenceInput: DataPostSequenceInput!
+    """The project name."""
+    project: String!
+  ): DataGetSequence
+  """
+  Create tables in a database. It is possible to post a maximum of 1000 tables per request.
+  
+  Equivalent to POST /api/v1/projects/{project}/raw/dbs/{dbName}/tables
+  """
+  createTables(
+    dataRawDBTableInput: DataRawDBTableInput!
+    """Name of the database to create tables in."""
+    dbName: String!
+    """Create database if it doesn't exist already"""
+    ensureParent: Boolean
+    """The project name."""
+    project: String!
+  ): DataRawDBTable
+  """
+  Delete a list of asset mappings
+  
+  Equivalent to POST /api/v1/projects/{project}/3d/models/{modelId}/revisions/{revisionId}/mappings/delete
+  """
+  delete3DMappings(
+    apiV1Project3dModelRevisionMappingsDeleteInput: ApiV1Project3dModelRevisionMappingsDeleteInput!
+    """Model ID."""
+    modelId: Float!
+    """The project name."""
+    project: String!
+    """Revision ID."""
+    revisionId: Float!
+  ): JSON
+  """
+  Delete 3D models
+  
+  Equivalent to POST /api/v1/projects/{project}/3d/models/delete
+  """
+  delete3DModels(
+    dataIdentifiersInput: DataIdentifiersInput!
+    """The project name."""
+    project: String!
+  ): JSON
+  """
+  Delete 3D revisions
+  
+  Equivalent to POST /api/v1/projects/{project}/3d/models/{modelId}/revisions/delete
+  """
+  delete3DRevisions(
+    dataIdentifiersInput: DataIdentifiersInput!
+    """Model ID."""
+    modelId: Float!
+    """The project name."""
+    project: String!
+  ): JSON
+  """
+  Delete assets. To delete all descendants, set recursive to true. The limit of the request does not include the number of descendants that are deleted.
+  
+  Equivalent to POST /api/v1/projects/{project}/assets/delete
+  """
+  deleteAssets(
+    deleteRequestInput: DeleteRequestInput!
+    """The project name."""
+    project: String!
+  ): JSON
+  """
+  It deletes a database, but fails if the database is not empty and recursive is set to false (default).
+  
+  Equivalent to POST /api/v1/projects/{project}/raw/dbs/delete
+  """
+  deleteDBs(
+    deleteRawDBInput: DeleteRawDBInput!
+    """The project name."""
+    project: String!
+  ): JSON
+  """
+  Delete datapoints from time series.
+  
+  Equivalent to POST /api/v1/projects/{project}/timeseries/data/delete
+  """
+  deleteDatapoints(
+    datapointsDeleteQueryInput: DatapointsDeleteQueryInput!
+    """The project name."""
+    project: String!
+  ): JSON
+  """
+  Deletes events with the given ids. A maximum of 1000 events can be deleted per request.
+  
+  Equivalent to POST /api/v1/projects/{project}/events/delete
+  """
+  deleteEvents(
+    eventDataIdsInput: EventDataIdsInput!
+    """The project name."""
+    project: String!
+  ): JSON
+  """
+  Delete extraction pipelines for given list of ids and externalIds. When the extraction pipeline is deleted, all extraction pipeline runs related to the extraction pipeline are automatically deleted.
+  
+  Equivalent to POST /api/v1/projects/{project}/extpipes/delete
+  """
+  deleteExtPipes(
+    itemsRequestExtPipeIdInput: ItemsRequestExtPipeIdInput!
+    """The project name."""
+    project: String!
+  ): JSON
+  """
+  Deletes the files with the given ids.
+  
+  A maximum of 1000 files can be deleted per request.
+  
+  Equivalent to POST /api/v1/projects/{project}/files/delete
+  """
+  deleteFiles(
+    fileDataIdsInput: FileDataIdsInput!
+    """The project name."""
+    project: String!
+  ): JSON
+  """
+  Delete the relationships between resources identified by the external IDs in the request. You can delete a maximum of 1000 relationships per request.
+  
+  Equivalent to POST /api/v1/projects/{project}/relationships/delete
+  """
+  deleteRelationships(
+    apiV1ProjectRelationshipsDeleteInput: ApiV1ProjectRelationshipsDeleteInput!
+    """The project name."""
+    project: String!
+  ): JSON
+  """
+  Delete rows in a table
+  
+  Equivalent to POST /api/v1/projects/{project}/raw/dbs/{dbName}/tables/{tableName}/rows/delete
+  """
+  deleteRows(
+    dataRawDBRowKeyInput: DataRawDBRowKeyInput!
+    """Name of the database containing the rows."""
+    dbName: String!
+    """The project name."""
+    project: String!
+    """Name of the table containing the rows."""
+    tableName: String!
+  ): JSON
+  """
+  Deletes the security categories that match the provided IDs.
+  If any of the provided IDs does not belong to an existing security category, then the request will fail and no security categories are deleted.
+  
+  
+  Equivalent to POST /api/v1/projects/{project}/securitycategories/delete
+  """
+  deleteSecurityCategories(
+    dataLongInput: DataLongInput!
+    """The project name."""
+    project: String!
+  ): JSON
+  """
+  Deletes the given rows of the sequence. All columns are affected.
+  
+  Equivalent to POST /api/v1/projects/{project}/sequences/data/delete
+  """
+  deleteSequenceData(
+    dataSequenceDataDeleteRequestInput: DataSequenceDataDeleteRequestInput!
+    """The project name."""
+    project: String!
+  ): JSON
+  """
+  Deletes the sequences with the specified IDs. If one or more of the sequences do not exist, ignoreUnknownIds controls what will happen: if it is true, the sequences that do exist will be deleted, and the request succeeds; if it is false or absent, nothing will be deleted, and the request fails.
+  
+  Equivalent to POST /api/v1/projects/{project}/sequences/delete
+  """
+  deleteSequences(
+    dataResourceIdsWithIgnoreUnknownIdsInput: DataResourceIdsWithIgnoreUnknownIdsInput!
+    """The project name."""
+    project: String!
+  ): JSON
+  """
+  Delete tables in a database
+  
+  Equivalent to POST /api/v1/projects/{project}/raw/dbs/{dbName}/tables/delete
+  """
+  deleteTables(
+    dataRawDBTableInput: DataRawDBTableInput!
+    """Name of the database to delete tables in."""
+    dbName: String!
+    """The project name."""
+    project: String!
+  ): JSON
+  """
+  Deletes the time series with the specified IDs and their datapoints.
+  
+  Equivalent to POST /api/v1/projects/{project}/timeseries/delete
+  """
+  deleteTimeSeries(
+    """The project name."""
+    project: String!
+    timeSeriesLookupByIdInput: TimeSeriesLookupByIdInput!
+  ): JSON
+  """
+  Convert interactive engineering diagrams to image format, with highlighted annotations.
+  Supported input file mime_types are application/pdf, image/jpeg, image/png, image/tiff.
+  Supported output image formats are PNG and SVG, only the svg embeds the input annotations.
+  
+  Equivalent to POST /api/v1/projects/{project}/context/diagram/convert/
+  """
+  diagramConvert(
+    apiV1ProjectContextDiagramConvertInput: ApiV1ProjectContextDiagramConvertInput
+    """The project name."""
+    project: String!
+  ): ApiV1ProjectContextDiagramConvert2
+  """
+  Detect annotations in engineering diagrams. Note: All users in a CDF project with assets read-all and files read-all capabilities can access data sent to this endpoint.
+  Supported input file mime_types are application/pdf, image/jpeg, image/png, image/tiff.
+  
+  Equivalent to POST /api/v1/projects/{project}/context/diagram/detect/
+  """
+  diagramDetect(
+    apiV1ProjectContextDiagramDetectInput: ApiV1ProjectContextDiagramDetectInput
+    """The project name."""
+    project: String!
+  ): ApiV1ProjectContextDiagramDetect2
+  """
+  Retrieves a list of download URLs for the specified list of file IDs. After getting the download links, the client has to issue a GET request to the returned URLs, which will respond with the contents of the file. The link will expire after 30 seconds.
+  
+  Equivalent to POST /api/v1/projects/{project}/files/downloadlink
+  """
+  downloadLinks(
+    fileLinkIdsInput: FileLinkIdsInput!
+    """The project name."""
+    project: String!
+  ): ApiV1ProjectFilesDownloadlink
+  """
+  Note: All users on this CDF subscription with assets read-all and entitymatching read-all and write-all capabilities in the project, are able to access the data sent to this endpoint. Train a model that predicts matches between entities (for example, time series names to asset names). This is also known as fuzzy joining. If there are no trueMatches (labeled data), you train a static (unsupervised) model, otherwise a machine learned (supervised) model is trained.
+  
+  Equivalent to POST /api/v1/projects/{project}/context/entitymatching/
+  """
+  entityMatchingCreate(
+    apiV1ProjectContextEntitymatching2Input: ApiV1ProjectContextEntitymatching2Input
+    """The project name."""
+    project: String!
+  ): EntityMatcherResponseSchema
+  """
+  Deletes an entity matching model. Currently, this is a soft delete, and only removes the entry from listing.
+  
+  Equivalent to POST /api/v1/projects/{project}/context/entitymatching/delete
+  """
+  entityMatchingDelete(
+    apiV1ProjectContextEntitymatchingDeleteInput: ApiV1ProjectContextEntitymatchingDeleteInput
+    """The project name."""
+    project: String!
+  ): JSON
+  """
+  Use filtering options to find entity matcher models.
+  
+  Equivalent to POST /api/v1/projects/{project}/context/entitymatching/list
+  """
+  entityMatchingFilter(
+    apiV1ProjectContextEntitymatchingListInput: ApiV1ProjectContextEntitymatchingListInput
+    """The project name."""
+    project: String!
+  ): ApiV1ProjectContextEntitymatchingList2
+  """
+  Note: All users on this CDF subscription with assets read-all and entitymatching read-all and write-all capabilities in the project, are able to access the data sent to this endpoint. Predicts entity matches using a trained model.
+  
+  Equivalent to POST /api/v1/projects/{project}/context/entitymatching/predict
+  """
+  entityMatchingPredict(
+    entityMatchingPredictSchemaInput: JSON
+    """The project name."""
+    project: String!
+  ): ApiV1ProjectContextEntitymatchingPredict
+  """
+  Note: All users on this CDF subscription with assets read-all and entitymatching read-all and write-all capabilities in the project, are able to access the data sent to this endpoint. Creates a new model by re-training an existing model on existing data but with additional true matches. The old model is not changed. The new model gets a new id and new external id if `newExternalId` is set, or no external id if `newExternalId` is not set. Use for efficient re-training of the model after a user creates additional confirmed matches.
+  
+  Equivalent to POST /api/v1/projects/{project}/context/entitymatching/refit
+  """
+  entityMatchingReFit(
+    entityMatchingRefitSchemaInput: JSON
+    """The project name."""
+    project: String!
+  ): ApiV1ProjectContextEntitymatchingRefit
+  """
+  Retrieve entity matching models by IDs or external IDs.
+  
+  Equivalent to POST /api/v1/projects/{project}/context/entitymatching/byids
+  """
+  entityMatchingRetrieve(
+    apiV1ProjectContextEntitymatchingByidsInput: ApiV1ProjectContextEntitymatchingByidsInput
+    """The project name."""
+    project: String!
+  ): ApiV1ProjectContextEntitymatchingByids2
+  """
+  Update entity matching models by IDs or external IDs.
+  
+  Equivalent to POST /api/v1/projects/{project}/context/entitymatching/update
+  """
+  entityMatchingUpdate(
+    apiV1ProjectContextEntitymatchingUpdateInput: ApiV1ProjectContextEntitymatchingUpdateInput
+    """The project name."""
+    project: String!
+  ): ApiV1ProjectContextEntitymatchingUpdate2
+  """
+  Lists 3D assets mappings that match the specified filter parameter. Only
+  one type of filter can be specified for each request, either `assetIds`, `nodeIds` or `treeIndexes`.
+  
+  
+  Asset references obtained from a mapping - through asset ids - may be
+  invalid, simply by the non-transactional nature of HTTP.
+  They are NOT maintained by any means from CDF, meaning they will be stored until the
+  reference is removed through the delete endpoint of 3d asset mappings.
+  
+  Equivalent to POST /api/v1/projects/{project}/3d/models/{modelId}/revisions/{revisionId}/mappings/list
+  """
+  filter3DAssetMappings(
+    assetMapping3DFilterRequestInput: AssetMapping3DFilterRequestInput
+    """Model ID."""
+    modelId: Float!
+    """The project name."""
+    project: String!
+    """Revision ID."""
+    revisionId: Float!
+  ): AssetMapping3DWithCursorResponse
+  """
+  List nodes in a project, filtered by node property values specified by supplied filters. This operation supports pagination and partitions.
+  
+  Equivalent to POST /api/v1/projects/{project}/3d/models/{modelId}/revisions/{revisionId}/nodes/list
+  """
+  filter3DNodes(
+    """Model ID."""
+    modelId: Float!
+    """Filter request for nodes. Filters nodes with properties matching ones in a list of alternatives."""
+    node3DFilterBodyInput: Node3DFilterBodyInput!
+    """The project name."""
+    project: String!
+    """Revision ID."""
+    revisionId: Float!
+  ): Node3DWithCursorResponse
+  """
+  Use advanced filtering options to find extraction pipelines.
+  
+  Equivalent to POST /api/v1/projects/{project}/extpipes/list
+  """
+  filterExtPipes(
+    extPipesFilterRequestInput: ExtPipesFilterRequestInput!
+    """The project name."""
+    project: String!
+  ): ExtPipes
+  """
+  Use advanced filtering options to find extraction pipeline runs. Sorted by createdTime value with descendant order.
+  
+  Equivalent to POST /api/v1/projects/{project}/extpipes/runs/list
+  """
+  filterRuns(
+    """The project name."""
+    project: String!
+    runsFilterRequestInput: RunsFilterRequestInput!
+  ): ItemsResponseExtPipeRunResponse
+  """
+  Retrieves specific nodes given by a list of IDs.
+  
+  Equivalent to POST /api/v1/projects/{project}/3d/models/{modelId}/revisions/{revisionId}/nodes/byids
+  """
+  get3DNodesById(
+    """Model ID."""
+    modelId: Float!
+    node3DIdsInput: Node3DIdsInput!
+    """The project name."""
+    project: String!
+    """Revision ID."""
+    revisionId: Float!
+  ): Node3DList
+  """
+  Retrieve data sets by IDs or external IDs.
+  
+  Equivalent to POST /api/v1/projects/{project}/datasets/byids
+  """
+  getDataSets(
+    dataSetIdEitherListInput: DataSetIdEitherListInput
+    """The project name."""
+    project: String!
+  ): DataSetList
+  """
+  Retrieves the latest data point in a time series.
+  
+  Equivalent to POST /api/v1/projects/{project}/timeseries/data/latest
+  """
+  getLatest(
+    datapointsLatestQueryInput: DatapointsLatestQueryInput!
+    """The project name."""
+    project: String!
+  ): DatapointsResponse
+  """
+  Retrieves the last row (i.e the row with the highest row number) in a sequence.
+  
+  Equivalent to POST /api/v1/projects/{project}/sequences/data/latest
+  """
+  getLatestSequenceRow(
+    """The project name."""
+    project: String!
+    """Parameters describing a query for latest row in a Sequence."""
+    sequenceLatestDataRequestInput: JSON!
+  ): SequenceGetData
+  """
+  Retrieves a list of data points from multiple time series in a project. This operation supports aggregation, but not pagination. A detailed description of how aggregates work can be found at [our concept guide for aggregation](<https://docs.cognite.com/dev/concepts/aggregation/>).
+  
+  Equivalent to POST /api/v1/projects/{project}/timeseries/data/list
+  """
+  getMultiTimeSeriesDatapoints(
+    datapointsMultiQueryInput: DatapointsMultiQueryInput!
+    """The project name."""
+    project: String!
+  ): DatapointsOrAggregatesResponse
+  """
+  Retrieve one or more sequences by ID or external ID. The sequences are returned in the same order as in the request.
+  
+  Equivalent to POST /api/v1/projects/{project}/sequences/byids
+  """
+  getSequenceById(
+    dataResourceIdsWithIgnoreUnknownIdsInput: DataResourceIdsWithIgnoreUnknownIdsInput!
+    """The project name."""
+    project: String!
+  ): DataGetSequence
+  """
+  Processes data requests, and returns the result. NB - This operation uses a dynamic limit on the number of rows returned based on the number and type of columns, use the provided cursor to paginate and retrieve all data.
+  
+  Equivalent to POST /api/v1/projects/{project}/sequences/data/list
+  """
+  getSequenceData(
+    """The project name."""
+    project: String!
+    """Parameters describing a query for datapoints."""
+    sequenceDataRequestInput: JSON!
+  ): SequenceGetDataWithCursor
+  """
+  Retrieve one or more time series by ID or external ID. The time series are returned in the same order as in the request.
+  
+  Equivalent to POST /api/v1/projects/{project}/timeseries/byids
+  """
+  getTimeSeriesByIds(
+    """The project name."""
+    project: String!
+    timeSeriesLookupByIdInput: TimeSeriesLookupByIdInput!
+  ): DataGetTimeSeriesMetadataDTO
+  """
+  Create metadata information and get an upload link for a file.
+  
+  To upload the file, use the uploadUrl link in the response in a separate request. 
+  To upload a file, send an HTTP PUT request to the uploadUrl with the relevant 'Content-Type' and 'Content-Length' headers.
+  
+  If the uploadUrl contains the string '/v1/files/gcs_proxy/', you can make a Google Cloud Storage (GCS) resumable upload request
+  as documented in https://cloud.google.com/storage/docs/json_api/v1/how-tos/resumable-upload.
+  
+  The uploadUrl expires after one week. 
+  Any file info entry that does not have the actual file uploaded within one week will be automatically deleted.
+  
+  Equivalent to POST /api/v1/projects/{project}/files
+  """
+  initFileUpload(
+    externalFilesMetadataInput: ExternalFilesMetadataInput!
+    """The 'Origin' header parameter is required if there is a Cross Origin issue."""
+    origin: String
+    """
+    If 'overwrite' is set to true, and the POST body content specifies a 'externalId' field, fields for the file found for externalId can be overwritten. The default setting is false. 
+    
+    If metadata is included in the request body, all of the original metadata will be overwritten.
+    The actual file will be overwritten after a successful upload with the uploadUrl from the response. 
+    If there is no successful upload, the current file contents will be kept. 
+    
+    File-Asset mappings only change if explicitly stated in the assetIds field of the POST json body. 
+    Do not set assetIds in request body if you want to keep the current file-asset mappings.
+    """
+    overwrite: Boolean
+    """The project name."""
+    project: String!
+  ): ApiV1ProjectFiles
+  """
+  Use advanced filtering options to find assets.
+  
+  Equivalent to POST /api/v1/projects/{project}/assets/list
+  """
+  listAssets(
+    assetListScopeInput: AssetListScopeInput
+    """The project name."""
+    project: String!
+  ): DataWithCursorAsset
+  """
+  Use advanced filtering options to find data sets.
+  
+  Equivalent to POST /api/v1/projects/{project}/datasets/list
+  """
+  listDataSets(
+    dataSetFilterRequestInput: DataSetFilterRequestInput
+    """The project name."""
+    project: String!
+  ): DataSetListWithCursor
+  """
+  Lists relationships matching the query filter in the request. You can retrieve a maximum of 1000 relationships per request.
+  
+  Equivalent to POST /api/v1/projects/{project}/relationships/list
+  """
+  listRelationships(
+    """The project name."""
+    project: String!
+    relationshipsAdvancedListRequestInput: RelationshipsAdvancedListRequestInput!
+  ): PagedEnrichedRelationshipResponseWrapper
+  """
+  Retrieves a list of time series matching the specified criteria. This operation supports pagination by cursor. Criteria can be applied to select a subset of time series.
+  
+  Equivalent to POST /api/v1/projects/{project}/timeseries/list
+  """
+  listTimeSeries(
+    """The project name."""
+    project: String!
+    """Filter request for time series. Filters exact field matching or timestamp ranges inclusive min and max."""
+    timeSeriesListDTOInput: TimeSeriesListDTOInput
+  ): DataWithCursorGetTimeSeriesMetadataDTO
+  """
+  Insert datapoints into a time series. You can do this for multiple time series.
+  If you insert a datapoint with a timestamp that already exists, it will be overwritten with the new value.
+  
+  Equivalent to POST /api/v1/projects/{project}/timeseries/data
+  """
+  postMultiTimeSeriesDatapoints(
+    datapointsInsertQueryInput: DatapointsInsertQueryInput!
+    """The project name."""
+    project: String!
+  ): JSON
+  """
+  Insert rows into a table. It is possible to post a maximum of 10000 rows per request.
+  It will replace the columns of an existing row if the rowKey already exists.
+  
+  The rowKey is limited to 1024 characters which also includes Unicode characters.
+  The maximum size of columns are 5 MiB, however the maximum size of one column name and value is 2621440 characters each.
+  If you want to store huge amount of data per row or column we recommend using the Files API to upload blobs, then reference it from the Raw row.
+  
+  The columns object is a key value object, where the key corresponds to the column name while the value is the column value.
+  It supports all the valid types of values in JSON, so number, string, array, and even nested JSON structure (see payload example to the right).
+  
+  **Note** There is no rollback if an error occurs, which means partial data may be written. However, it's safe to retry the request, since this endpoint supports both update and insert (upsert).
+  
+  
+  Equivalent to POST /api/v1/projects/{project}/raw/dbs/{dbName}/tables/{tableName}/rows
+  """
+  postRows(
+    dataRawDBRowInput: DataRawDBRowInput!
+    """Name of the database."""
+    dbName: String!
+    """Create database/table if it doesn't exist already"""
+    ensureParent: Boolean
+    """The project name."""
+    project: String!
+    """Name of the table."""
+    tableName: String!
+  ): JSON
+  """
+  Inserts rows into a sequence. This overwrites data in rows and columns that exist.
+  
+  Equivalent to POST /api/v1/projects/{project}/sequences/data
+  """
+  postSequenceData(
+    dataSequencePostDataInput: DataSequencePostDataInput!
+    """The project name."""
+    project: String!
+  ): JSON
+  """
+  Create one or more time series.
+  
+  Equivalent to POST /api/v1/projects/{project}/timeseries
+  """
+  postTimeSeries(
+    """The project name."""
+    project: String!
+    timeSeriesCreateRequestInput: TimeSeriesCreateRequestInput!
+  ): DataGetTimeSeriesMetadataDTO
+  """
+  Execute an on-the-fly synthetic query
+  
+  Equivalent to POST /api/v1/projects/{project}/timeseries/synthetic/query
+  """
+  querySyntheticTimeseries(
+    """The project name."""
+    project: String!
+    syntheticMultiQueryInput: SyntheticMultiQueryInput!
+  ): SyntheticQueryResponses
+  """
+  Fulltext search for assets based on result relevance. Primarily meant
+  for human-centric use-cases, not for programs, since matching and
+  ordering may change over time. Additional filters can also be
+  specified. This operation does not support pagination.
+  
+  Equivalent to POST /api/v1/projects/{project}/assets/search
+  """
+  searchAssets(
+    """Search request with filter capabilities."""
+    assetSearchFilterInput: AssetSearchFilterInput!
+    """The project name."""
+    project: String!
+  ): DataAsset
+  """
+  Search within events
+  
+  Equivalent to POST /api/v1/projects/{project}/events/search
+  """
+  searchEvents(
+    """Filter on events filter with exact match"""
+    eventSearchRequestInput: EventSearchRequestInput
+    """The project name."""
+    project: String!
+  ): EventResponse
+  """
+  Search for files based on relevance. You can also supply a strict match filter as in Filter files, and search in the results from the filter. Returns first 1000 results based on relevance. This operation does not support pagination.
+  
+  Equivalent to POST /api/v1/projects/{project}/files/search
+  """
+  searchFiles(
+    """Filter on files with exact match"""
+    filesSearchFilterInput: FilesSearchFilterInput
+    """The project name."""
+    project: String!
+  ): DataFileMetadata
+  """
+  Retrieves a list of sequences matching the given criteria. This operation does not support pagination.
+  
+  Equivalent to POST /api/v1/projects/{project}/sequences/search
+  """
+  searchSequences(
+    """The project name."""
+    project: String!
+    sequencesSearchDTOInput: SequencesSearchDTOInput
+  ): DataGetSequence
+  """
+  Fulltext search for time series based on result relevance. Primarily meant
+  for human-centric use-cases, not for programs, since matching and
+  ordering may change over time. Additional filters can also be
+  specified. This operation does not support pagination.
+  
+  Equivalent to POST /api/v1/projects/{project}/timeseries/search
+  """
+  searchTimeSeries(
+    """The project name."""
+    project: String!
+    timeSeriesSearchDTOInput: TimeSeriesSearchDTOInput
+  ): DataGetTimeSeriesMetadataDTO
+  """
+  Update 3D models
+  
+  Equivalent to POST /api/v1/projects/{project}/3d/models/update
+  """
+  update3DModels(
+    apiV1Project3dModelsUpdateInput: ApiV1Project3dModelsUpdateInput!
+    """The project name."""
+    project: String!
+  ): Model3DList
+  """
+  Update 3D revisions
+  
+  Equivalent to POST /api/v1/projects/{project}/3d/models/{modelId}/revisions/update
+  """
+  update3DRevisions(
+    apiV1Project3dModelRevisionsUpdateInput: ApiV1Project3dModelRevisionsUpdateInput
+    """Model ID."""
+    modelId: Float!
+    """The project name."""
+    project: String!
+  ): Revision3DList
+  """
+  Update the attributes of assets.
+  
+  Equivalent to POST /api/v1/projects/{project}/assets/update
+  """
+  updateAssets(
+    dataAssetChangeInput: DataAssetChangeInput!
+    """The project name."""
+    project: String!
+  ): DataAsset
+  """
+  Update the attributes of data sets.
+  
+  Equivalent to POST /api/v1/projects/{project}/datasets/update
+  """
+  updateDataSets(
+    dataSetUpdateListInput: DataSetUpdateListInput!
+    """The project name."""
+    project: String!
+  ): DataSetList
+  """
+  Updates events in the same project. This operation supports partial updates; Fields omitted from queries will remain unchanged on objects.
+  
+  For primitive fields (String, Long, Int), use 'set': 'value' to update value; use 'setNull': true to set that field to null.
+  
+  For the Json Array field (e.g. assetIds), use 'set': [value1, value2] to update value; use 'add': [v1, v2] to add values to current list of values; use 'remove': [v1, v2] to remove these values from current list of values if exists.
+  
+  A maximum of 1000 events can be updated per request, and all of the event IDs must be unique.
+  
+  Equivalent to POST /api/v1/projects/{project}/events/update
+  """
+  updateEvents(
+    dataEventChangeInput: DataEventChangeInput!
+    """The project name."""
+    project: String!
+  ): EventResponse
+  """
+  Update information for a list of extraction pipelines. Fields that are not included in the request, are not changed.
+  
+  Equivalent to POST /api/v1/projects/{project}/extpipes/update
+  """
+  updateExtPipes(
+    itemsRequestExtPipeUpdateInput: ItemsRequestExtPipeUpdateInput!
+    """The project name."""
+    project: String!
+  ): ExtPipes
+  """
+  Updates the information for the files specified in the request body.
+  
+  If you want to update the file content, uploaded using the uploadUrl, please
+  use the initFileUpload request with the query parameter 'overwrite=true'.
+  Alternatively, delete and recreate the file.
+  
+  For primitive fields (String, Long, Int), use 'set': 'value' to update
+  value; use 'setNull': true to set that field to null.
+  
+  For the Json Array field (e.g. assetIds and securityCategories): Use either only 'set', or a combination of 'add' and/or 'remove'. 
+  
+  __AssetIds update examples__:
+  
+  Example request body to overwrite assetIds with a new set, asset ID 1 and 2.
+  
+  ```
+  {
+    "items": [
+      {
+        "id": 1,
+        "update": {
+          "assetIds" : {
+            "set" : [ 1, 2 ]
+          }
+        }
+      }
+    ]
+  }
+  ```
+  
+  Example request body to add one asset Id, and remove another asset ID.
+  
+  ```
+  {
+    "items": [
+      {
+        "id": 1,
+        "update": {
+          "assetIds" : {
+            "add" : [ 3 ],
+            "remove": [ 2 ]
+          }
+        }
+      }
+    ]
+  }
+  ```
+  
+  __Metadata update examples__:
+  
+  Example request body to overwrite metadata with a new set.
+  ```
+  {
+    "items": [
+      {
+        "id": 1,
+        "update": {
+          "metadata": {
+            "set": {
+              "key1": "value1",
+              "key2": "value2"
+            }
+          }
+        }
+      }
+    ]
+  }
+  ```
+  
+  Example request body to add two key-value pairs and remove two other key-value pairs by key for
+  the metadata field.
+  ```
+  {
+    "items": [
+      {
+        "id": 1,
+        "update": {
+          "metadata": {
+            "add": {
+              "key3": "value3",
+              "key4": "value4"
+            },
+            "remove": [
+              "key1",
+              "key2"
+            ]
+          }
+        }
+      }
+    ]
+  }
+  ```
+  
+  Equivalent to POST /api/v1/projects/{project}/files/update
+  """
+  updateFiles(
+    dataFileChangeInput: DataFileChangeInput!
+    """The project name."""
+    project: String!
+  ): DataFileMetadata
+  """
+  Update relationships between resources according to the partial definitions of the relationships given in the payload of the request. This means that fields not mentioned in the payload will remain unchanged. Up to 1000 relationships can be updated in one operation.
+  To delete a value from an optional value the `setNull` field should be set to `true`.
+  The order of the updated relationships in the response equals the order in the request.
+  
+  Equivalent to POST /api/v1/projects/{project}/relationships/update
+  """
+  updateRelationships(
+    """The project name."""
+    project: String!
+    updateRelationshipWrapperInput: UpdateRelationshipWrapperInput!
+  ): RelationshipResponseWrapper
+  """
+  Update one or more sequences. Fields that are not included in the request, are not changed.
+  
+  Equivalent to POST /api/v1/projects/{project}/sequences/update
+  """
+  updateSequences(
+    dataSequenceChangeInput: DataSequenceChangeInput!
+    """The project name."""
+    project: String!
+  ): DataGetSequence
+  """
+  Update 3D revision thumbnail
+  
+  Equivalent to POST /api/v1/projects/{project}/3d/models/{modelId}/revisions/{revisionId}/thumbnail
+  """
+  updateThumbnail(
+    """Model ID."""
+    modelId: Float!
+    """The project name."""
+    project: String!
+    """Revision ID."""
+    revisionId: Float!
+    """Request body for the updateModelRevisionThumbnail endpoint."""
+    updateRevision3DThumbnailInput: UpdateRevision3DThumbnailInput
+  ): JSON
+}
+
+"""Filter request for events. Filters exact field matching or timestamp ranges inclusive min and max."""
+input EventFilterRequestInput {
+  cursor: String
+  """Filter on events filter with exact match"""
+  filter: EventFilterInput
+  """<- Limits the maximum number of results to be returned by single request. In case there are more results to the request 'nextCursor' attribute will be provided as part of response. Request may contain less results than request limit."""
+  limit: Int
+  """
+  Splits the data set into N partitions.
+  You need to follow the cursors within each partition in order to receive all the data.
+  Example: 1/10
+  
+  """
+  partition: String
+  """
+  Sort by array of selected fields. Syntax: `["<fieldname>:asc|desc"]`. Default sort order is `asc` with short syntax: `["<fieldname>"]`.
+  Filter accepts the following field names: startTime, endTime, createdTime, lastUpdatedTime.
+  Partitions are done independently of sorting, there is no guarantee on sort order between elements from different partitions.
+  
+  """
+  sort: [String]
+}
+
+"""Filter on events filter with exact match"""
+input EventFilterInput {
+  """Event is considered active from its startTime to endTime inclusive. If startTime is null, event is never active. If endTime is null, event is active from startTime onwards. activeAtTime filter will match all events that are active at some point from min to max, from min, or to max, depending on which of min and max parameters are specified."""
+  activeAtTime: ActiveAtTimeFilterInput
+  """Asset External IDs of equipment that this event relates to."""
+  assetExternalIds: [String]
+  """Asset IDs of equipment that this event relates to."""
+  assetIds: [Float]
+  """Only include events that have a related asset in a subtree rooted at any of these assetIds (including the roots given). If the total size of the given subtrees exceeds 100,000 assets, an error will be returned."""
+  assetSubtreeIds: [JSON]
+  """Range between two timestamps (inclusive)."""
+  createdTime: EpochTimestampRangeInput
+  dataSetIds: [JSON]
+  """Either range between two timestamps or isNull filter condition."""
+  endTime: JSON
+  """Filter by this (case-sensitive) prefix for the external ID."""
+  externalIdPrefix: String
+  """Range between two timestamps (inclusive)."""
+  lastUpdatedTime: EpochTimestampRangeInput
+  """Custom, application specific metadata. String key -> String value. Limits: Maximum length of key is 128 bytes, value 128000 bytes, up to 256 key-value pairs, of total size at most 200000."""
+  metadata: JSON
+  """This parameter is deprecated. Use assetSubtreeIds instead. Only include events that have a related asset in a tree rooted at any of these root assetIds."""
+  rootAssetIds: [JSON]
+  """The source of this event."""
+  source: String
+  """Range between two timestamps (inclusive)."""
+  startTime: EpochTimestampRangeInput
+  """SubType of the event, e.g 'electrical'."""
+  subtype: String
+  """Type of the event, e.g 'failure'."""
+  type: String
+}
+
+"""Event is considered active from its startTime to endTime inclusive. If startTime is null, event is never active. If endTime is null, event is active from startTime onwards. activeAtTime filter will match all events that are active at some point from min to max, from min, or to max, depending on which of min and max parameters are specified."""
+input ActiveAtTimeFilterInput {
+  """Maximum timestamp (inclusive). The timestamp is represented as number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  max: Float
+  """Minimum timestamp (inclusive). The timestamp is represented as number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  min: Float
+}
+
+"""Range between two timestamps (inclusive)."""
+input EpochTimestampRangeInput {
+  """Maximum timestamp (inclusive). The timestamp is represented as number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  max: Float
+  """Minimum timestamp (inclusive). The timestamp is represented as number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  min: Float
+}
+
+input FileFilterRequestInput {
+  cursor: String
+  filter: Filter2Input
+  """<- Maximum number of items that the client want to get back."""
+  limit: Int
+  """
+  Splits the data set into N partitions.
+  You need to follow the cursors within each partition in order to receive all the data.
+  Example: 1/10
+  
+  """
+  partition: String
+}
+
+input Filter2Input {
+  """Only include files that reference these specific asset external IDs."""
+  assetExternalIds: [String]
+  """Only include files that reference these specific asset IDs."""
+  assetIds: [Float]
+  """Only include files that have a related asset in a subtree rooted at any of these assetIds (including the roots given). If the total size of the given subtrees exceeds 100,000 assets, an error will be returned."""
+  assetSubtreeIds: [JSON]
+  """Range between two timestamps (inclusive)."""
+  createdTime: EpochTimestampRangeInput
+  """Only include files that belong to these datasets."""
+  dataSetIds: [JSON]
+  """Filter by this (case-sensitive) prefix for the directory."""
+  directoryPrefix: String
+  """Filter by this (case-sensitive) prefix for the external ID."""
+  externalIdPrefix: String
+  """Only include files matching the specified geographic relation."""
+  geoLocation: GeoLocationFilterInput
+  """Return only the resource matching the specified label constraints."""
+  labels: JSON
+  """Range between two timestamps (inclusive)."""
+  lastUpdatedTime: EpochTimestampRangeInput
+  """Custom, application specific metadata. String key -> String value. Limits: Maximum length of key is 128 bytes, value 10240 bytes, up to 256 key-value pairs, of total size at most 10240."""
+  metadata: JSON
+  """File type. E.g. text/plain, application/pdf, .."""
+  mimeType: String
+  """Name of the file."""
+  name: String
+  """Only include files that have a related asset in a tree rooted at any of these root assetIds."""
+  rootAssetIds: [JSON]
+  """The source of this event."""
+  source: String
+  sourceCreatedTime: SourceCreatedTime4Input
+  sourceModifiedTime: SourceModifiedTime4Input
+  """Whether or not the actual file is uploaded. This field is returned only by the API, it has no effect in a post body."""
+  uploaded: Boolean
+  """Range between two timestamps (inclusive)."""
+  uploadedTime: EpochTimestampRangeInput
+}
+
+"""Only include files matching the specified geographic relation."""
+input GeoLocationFilterInput {
+  """One of the supported queries."""
+  relation: Relation!
+  """Represents the points, curves and surfaces in the coordinate space."""
+  shape: JSON!
+}
+
+enum Relation {
+  INTERSECTS
+  DISJOINT
+  WITHIN
+}
+
+input SourceCreatedTime4Input {
+  """Maximum timestamp (inclusive). The timestamp is represented as number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  max: Float
+  """Minimum timestamp (inclusive). The timestamp is represented as number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  min: Float
+}
+
+input SourceModifiedTime4Input {
+  """Maximum timestamp (inclusive). The timestamp is represented as number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  max: Float
+  """Minimum timestamp (inclusive). The timestamp is represented as number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  min: Float
+}
+
+input SequencesAdvancedListDTOInput {
+  cursor: String
+  filter: SequenceFilterInput
+  """Return up to this many results per page."""
+  limit: Int
+  """
+  Splits the data set into N partitions.
+  You need to follow the cursors within each partition in order to receive all the data.
+  Example: 1/10
+  
+  """
+  partition: String
+}
+
+input SequenceFilterInput {
+  """Return only sequences linked to one of the specified assets."""
+  assetIds: [Float]
+  """Only include sequences that have a related asset in a subtree rooted at any of these assetIds (including the roots given). If the total size of the given subtrees exceeds 100,000 assets, an error will be returned."""
+  assetSubtreeIds: [JSON]
+  """Range between two timestamps (inclusive)."""
+  createdTime: EpochTimestampRangeInput
+  """Only include sequences that belong to these datasets."""
+  dataSetIds: [JSON]
+  """Filter by this (case-sensitive) prefix for the external ID."""
+  externalIdPrefix: String
+  """Range between two timestamps (inclusive)."""
+  lastUpdatedTime: EpochTimestampRangeInput
+  """Filter the sequences by metadata fields and values (case-sensitive). Format is {"key1":"value1","key2":"value2"}."""
+  metadata: JSON
+  """Return only sequences with this *exact* name."""
+  name: String
+  """Only include sequences that have a related asset in a tree rooted at any of these root assetIds."""
+  rootAssetIds: [Float]
+}
+
+type DataAssetAggregate {
+  items: [AssetAggregate]!
+}
+
+"""Aggregation group of assets"""
+type AssetAggregate {
+  """Size of the aggregation group"""
+  count: Float!
+}
+
+"""Aggregation request of assets. Filters behave the same way as for the `list` endpoint. Default aggregation is `count`."""
+input AssetAggregateRequestInput {
+  """Filter on assets with strict matching."""
+  filter: FilterInput
+}
+
+"""Filter on assets with strict matching."""
+input FilterInput {
+  """Only include assets in subtrees rooted at the specified assets (including the roots given). If the total size of the given subtrees exceeds 100,000 assets, an error will be returned."""
+  assetSubtreeIds: [JSON]
+  """Range between two timestamps (inclusive)."""
+  createdTime: EpochTimestampRangeInput
+  dataSetIds: [JSON]
+  """Filter by this (case-sensitive) prefix for the external ID."""
+  externalIdPrefix: String
+  """Return only the resource matching the specified label constraints."""
+  labels: JSON
+  """Range between two timestamps (inclusive)."""
+  lastUpdatedTime: EpochTimestampRangeInput
+  """Custom, application specific metadata. String key -> String value. Limits: Maximum length of key is 128 bytes, value 10240 bytes, up to 256 key-value pairs, of total size at most 10240."""
+  metadata: JSON
+  """The name of the asset."""
+  name: String
+  """Return only the direct descendants of the specified assets."""
+  parentExternalIds: [String]
+  """Return only the direct descendants of the specified assets."""
+  parentIds: [Float]
+  """Whether the filtered assets are root assets, or not. Set to True to only list root assets."""
+  root: Boolean
+  """This parameter is deprecated. Use assetSubtreeIds instead. Only include these root assets and their descendants."""
+  rootIds: [JSON]
+  """The source of the asset."""
+  source: String
+}
+
+type DataDataSetAggregate {
+  items: [DataSetAggregate]!
+}
+
+"""Aggregation group of data sets"""
+type DataSetAggregate {
+  """Size of the aggregation group"""
+  count: Float!
+}
+
+"""Aggregation request of data sets. Filters exact field matching or timestamp ranges inclusive min and max."""
+input DataSetAggregateRequestInput {
+  """Filter on data sets with strict matching."""
+  filter: DataSetFilterInput
+}
+
+"""Filter on data sets with strict matching."""
+input DataSetFilterInput {
+  """Range between two timestamps (inclusive)."""
+  createdTime: EpochTimestampRangeInput
+  """Filter by this (case-sensitive) prefix for the external ID."""
+  externalIdPrefix: String
+  """Range between two timestamps (inclusive)."""
+  lastUpdatedTime: EpochTimestampRangeInput
+  """Custom, application specific metadata. String key -> String value. Limits: Maximum length of key is 128 bytes, value 10240 bytes, up to 256 key-value pairs, of total size at most 10240."""
+  metadata: JSON
+  writeProtected: Boolean
+}
+
+"""No description available."""
+union AggregateResult = CountAggregateResult | ValuesAggregateResult
+
+"""Count aggregation result."""
+type CountAggregateResult {
+  items: [Items8ListItem]!
+}
+
+type Items8ListItem {
+  """Number of items in this aggregation group."""
+  count: Float!
+}
+
+"""Values aggregation result."""
+type ValuesAggregateResult {
+  items: [Items9ListItem]!
+}
+
+"""No description available."""
+union Items9ListItem = StringValue | IntegerValue
+
+"""A unique string value in the field."""
+type StringValue {
+  value: String!
+}
+
+"""A unique integer value in the field."""
+type IntegerValue {
+  value: Float!
+}
+
+type DataFilesAggregate {
+  items: [FilesAggregate]!
+}
+
+"""Aggregation results for files"""
+type FilesAggregate {
+  """Number of filtered items included in aggregation"""
+  count: Float!
+}
+
+"""Filter on files with exact match"""
+input FileFilterInput {
+  filter: Filter2Input
+}
+
+type SequenceAggregateResponse {
+  items: [Items63ListItem]!
+}
+
+"""count of elements in the aggregation group"""
+type Items63ListItem {
+  count: Float!
+}
+
+input SequencesAggregateDTOInput {
+  filter: SequenceFilterInput
+}
+
+type TimeSeriesAggregateResponse {
+  items: [Items37ListItem]!
+}
+
+"""count of elements in the aggregation group"""
+type Items37ListItem {
+  count: Float!
+}
+
+input TimeSeriesAggregateDTOInput {
+  filter: Filter4Input
+}
+
+input Filter4Input {
+  """Asset External IDs of related equipment that this time series relates to."""
+  assetExternalIds: [String]
+  """Only include time series that reference these specific asset IDs."""
+  assetIds: [Float]
+  """Only include time series that are related to an asset in a subtree rooted at any of these assetIds (including the roots given). If the total size of the given subtrees exceeds 100,000 assets, an error will be returned."""
+  assetSubtreeIds: [JSON]
+  """Range between two timestamps (inclusive)."""
+  createdTime: EpochTimestampRangeInput
+  """Only include time series that reference these specific data set IDs."""
+  dataSetIds: [JSON]
+  """Filter by this (case-sensitive) prefix for the external ID."""
+  externalIdPrefix: String
+  """Filter on isStep."""
+  isStep: Boolean
+  """Filter on isString."""
+  isString: Boolean
+  """Range between two timestamps (inclusive)."""
+  lastUpdatedTime: EpochTimestampRangeInput
+  """Custom, application specific metadata. String key -> String value. Limits: Maximum length of key is 128 bytes, up to 256 key-value pairs, of total size of at most 10000 bytes across all keys and values."""
+  metadata: JSON
+  """Filter on name."""
+  name: String
+  """Only include time series that have a related asset in a tree rooted at any of these root assetIds."""
+  rootAssetIds: [Float]
+  """Filter on unit."""
+  unit: String
+}
+
+"""List of responses. The order matches the requests order."""
+type DataGetTimeSeriesMetadataDTO {
+  items: [GetTimeSeriesMetadataDTO]!
+}
+
+input TimeSeriesUpdateRequestInput {
+  items: [JSON]!
+}
+
+type DataAsset {
+  items: [Asset]!
+}
+
+input AssetDataIdsInput {
+  """Set of aggregated properties to include"""
+  aggregatedProperties: [AggregatedProperty]
+  """Ignore IDs and external IDs that are not found"""
+  ignoreUnknownIds: Boolean
+  items: [JSON]!
+}
+
+enum AggregatedProperty {
+  CHILDCOUNT
+  PATH
+  DEPTH
+}
+
+type EventResponse {
+  items: [Event]!
+}
+
+input EventDataIdsInput {
+  """Ignore IDs and external IDs that are not found"""
+  ignoreUnknownIds: Boolean
+  items: [JSON]!
+}
+
+type DataFileMetadata {
+  items: [FilesMetadata]
+}
+
+input FileDataIdsWithIgnoreUnknownIdsInput {
+  """Ignore IDs and external IDs that are not found"""
+  ignoreUnknownIds: Boolean
+  items: [JSON]!
+}
+
+input ExtendedItemsRequestExtPipeIdInput {
+  """Ignore IDs and external IDs that are not found"""
+  ignoreUnknownIds: Boolean
+  items: [JSON]!
+}
+
+type EnrichedRelationshipResponseWrapper {
+  items: [EnrichedRelationshipResponse]!
+}
+
+type EnrichedRelationshipResponse {
+  """Confidence value of the existence of the relationship. Generated relationships provide a score of the likelihood of the relationship existing. Relationships without a confidence value can be interpreted at the discretion of each project."""
+  confidence: Float
+  """The time, in milliseconds since Jan. 1, 1970, when the relationship was created."""
+  createdTime: Int!
+  """The ID of the dataset the relationship belongs to."""
+  dataSetId: Int
+  """The time, in milliseconds since Jan. 1, 1970, when the relationship became inactive. If there is no endTime, the relationship is active from startTime until the present or any point in the future. If endTime and startTime are set, the endTime must be greater than startTime."""
+  endTime: Int
+  """The external ID of the relationship."""
+  externalId: String!
+  """A list of the labels associated with this resource item."""
+  labels: [Label]
+  """The time, in milliseconds since Jan. 1, 1970, when the relationship was last updated."""
+  lastUpdatedTime: Int!
+  source: Source3
+  """The external ID of the resource that is the relationship source."""
+  sourceExternalId: String!
+  """The resource type of the relationship source. Must be one of the specified values."""
+  sourceType: String!
+  """The time, in milliseconds since Jan. 1, 1970, when the relationship became active. If there is no startTime, the relationship is active from the beginning of time until endTime."""
+  startTime: Int
+  target: Target2
+  """The external ID of the resource that is the relationship target."""
+  targetExternalId: String!
+  """The resource type of the relationship target. Must be one of the specified values."""
+  targetType: String!
+}
+
+"""No description available."""
+union Source3 = GetSequenceDTO | GetTimeSeriesMetadataDTO
+
+"""No description available."""
+union Target2 = GetSequenceDTO | GetTimeSeriesMetadataDTO
+
+input ByIdsRequestInput {
+  """
+  If true,
+  will try to fetch the resources referred to in the relationship,
+  based on the users access rights.
+  Will silently fail to attatch the resources if the user lacks access to some of them.
+  
+  """
+  fetchResources: Boolean
+  """Ignore external IDs that are not found."""
+  ignoreUnknownIds: Boolean
+  items: [ExternalIdObjectInput]!
+}
+
+input ExternalIdObjectInput {
+  """The external ID of the relationship."""
+  externalId: String!
+}
+
+type AssetMapping3DList {
+  items: [AssetMapping3D]!
+}
+
+input ApiV1Project3dModelRevisionMappingsInput {
+  items: [CreateAssetMapping3DInput]!
+}
+
+input CreateAssetMapping3DInput {
+  """The ID of the associated asset (Cognite's Assets API)."""
+  assetId: Float!
+  """The ID of the node."""
+  nodeId: Float!
+}
+
+type Model3DList {
+  items: [Model3D]!
+}
+
+input ApiV1Project3dModelsInput {
+  items: [CreateModel3DInput]!
+}
+
+input CreateModel3DInput {
+  """The dataSet Id for the item."""
+  dataSetId: Float
+  """Custom, application specific metadata. String key -> String value. Limits: Maximum length of key is 32 bytes, value 512 bytes, up to 16 key-value pairs."""
+  metadata: JSON
+  """The name of the model."""
+  name: String!
+}
+
+type Revision3DList {
+  items: [Revision3D]!
+}
+
+input ApiV1Project3dModelRevisionsInput {
+  items: [CreateRevision3DInput]!
+}
+
+input CreateRevision3DInput {
+  """Initial camera position and target."""
+  camera: RevisionCameraPropertiesInput
+  """The file id to a file uploaded to Cognite's Files API. Can only be set on revision creation, and can never be updated."""
+  fileId: Float!
+  """Custom, application specific metadata. String key -> String value. Limits: Maximum length of key is 32 bytes, value 512 bytes, up to 16 key-value pairs."""
+  metadata: JSON
+  """True if the revision is marked as published."""
+  published: Boolean
+  rotation: [Float]
+}
+
+"""Initial camera position and target."""
+input RevisionCameraPropertiesInput {
+  """Initial camera position."""
+  position: [Float]
+  """Initial camera target."""
+  target: [Float]
+}
+
+input DataExternalAssetInput {
+  items: [DataExternalAssetItemInput]!
+}
+
+input DataExternalAssetItemInput {
+  """The id of the dataset this asset belongs to."""
+  dataSetId: Int
+  """The description of the asset."""
+  description: String
+  """The external ID provided by the client. Must be unique for the resource type."""
+  externalId: String
+  """A list of the labels associated with this resource item."""
+  labels: [LabelInput]
+  """Custom, application specific metadata. String key -> String value. Limits: Maximum length of key is 128 bytes, value 10240 bytes, up to 256 key-value pairs, of total size at most 10240."""
+  metadata: JSON
+  """The name of the asset."""
+  name: String!
+  """The external ID of the parent. This will be resolved to an internal ID and stored as `parentId`."""
+  parentExternalId: String
+  """
+  The parent node's ID used to specify parent-child relationship.
+  
+  You should not use this field in combination with the parentExternalId field.
+  
+  """
+  parentId: Int
+  """The source of the asset."""
+  source: String
+}
+
+"""A label assigned to a resource."""
+input LabelInput {
+  """An external ID to a predefined label definition."""
+  externalId: String!
+}
+
+type DataRawDB {
+  items: [RawDB]
+}
+
+input DataRawDBInput {
+  items: [RawDBInput]
+}
+
+"""A NoSQL database to store customer data."""
+input RawDBInput {
+  """Unique name of a database."""
+  name: String!
+}
+
+type DataSetList {
+  items: [DataSet]!
+}
+
+type DataSet {
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  createdTime: Float!
+  """The description of the data set."""
+  description: String
+  """The external ID provided by the client. Must be unique for the resource type."""
+  externalId: String
+  """A server-generated ID for the object."""
+  id: Float!
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  lastUpdatedTime: Float!
+  """Custom, application specific metadata. String key -> String value. Limits: Maximum length of key is 128 bytes, value 10240 bytes, up to 256 key-value pairs, of total size at most 10240."""
+  metadata: JSON
+  """The name of the data set."""
+  name: String
+  """To write data to a write-protected data set, you need to be a member of a group that has the "datasets:owner" action for the data set.  To learn more about write-protected data sets, follow this [guide](/cdf/data_governance/concepts/datasets/#write-protection)"""
+  writeProtected: Boolean!
+}
+
+input DataSetSpecListInput {
+  items: [DataSetSpecInput]!
+}
+
+input DataSetSpecInput {
+  """The description of the data set."""
+  description: String
+  """The external ID provided by the client. Must be unique for the resource type."""
+  externalId: String
+  """Custom, application specific metadata. String key -> String value. Limits: Maximum length of key is 128 bytes, value 10240 bytes, up to 256 key-value pairs, of total size at most 10240."""
+  metadata: JSON
+  """The name of the data set."""
+  name: String
+  """To write data to a write-protected data set, you need to be a member of a group that has the "datasets:owner" action for the data set.  To learn more about write-protected data sets, follow this [guide](/cdf/data_governance/concepts/datasets/#write-protection)"""
+  writeProtected: Boolean
+}
+
+input DataExternalEventInput {
+  items: [ExternalEventInput]!
+}
+
+"""An event represents something that happened at a given interval in time, e.g a failure, a work order etc."""
+input ExternalEventInput {
+  """Asset IDs of equipment that this event relates to."""
+  assetIds: [Float]
+  """The id of the dataset this event belongs to."""
+  dataSetId: Int
+  """Textual description of the event."""
+  description: String
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  endTime: Float
+  """The external ID provided by the client. Must be unique for the resource type."""
+  externalId: String
+  """Custom, application specific metadata. String key -> String value. Limits: Maximum length of key is 128 bytes, value 128000 bytes, up to 256 key-value pairs, of total size at most 200000."""
+  metadata: JSON
+  """The source of this event."""
+  source: String
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  startTime: Float
+  """SubType of the event, e.g 'electrical'."""
+  subtype: String
+  """Type of the event, e.g 'failure'."""
+  type: String
+}
+
+input ItemsRequestCreateExtPipeInput {
+  items: [CreateExtPipeInput]!
+}
+
+input CreateExtPipeInput {
+  """Contacts list."""
+  contacts: [ContactInput]
+  """DataSet ID"""
+  dataSetId: Float!
+  """Description of Extraction Pipeline"""
+  description: String
+  """Documentation text field, supports Markdown for text formatting."""
+  documentation: String
+  """External Id provided by client. Should be unique within the project."""
+  externalId: String!
+  """Custom, application specific metadata. String key -> String value. Limits: Key are at most 128 bytes. Values are at most 10240 bytes. Up to 256 key-value pairs. Total size is at most 10240."""
+  metadata: JSON
+  """Name of Extraction Pipeline"""
+  name: String!
+  """Raw tables"""
+  rawTables: [RawTableInput]
+  """Possible values: “On trigger”, “Continuous” or cron expression. If empty then null"""
+  schedule: String
+  """Source for Extraction Pipeline"""
+  source: String
+}
+
+input ContactInput {
+  """Contact email"""
+  email: String
+  """Contact name"""
+  name: String
+  """Contact role"""
+  role: String
+  """True, if contact receives email notifications"""
+  sendNotification: Boolean
+}
+
+input RawTableInput {
+  """Database name"""
+  dbName: String!
+  """Table name"""
+  tableName: String!
+}
+
+type RelationshipResponseWrapper {
+  items: [RelationshipResponse]!
+}
+
+input RelationshipRequestWrapperInput {
+  items: [RelationshipInput]!
+}
+
+"""The representation of a relationship consists of a source and a target and additional parameters."""
+input RelationshipInput {
+  """Confidence value of the existence of the relationship. Generated relationships provide a score of the likelihood of the relationship existing. Relationships without a confidence value can be interpreted at the discretion of each project."""
+  confidence: Float
+  """The ID of the dataset the relationship belongs to."""
+  dataSetId: Int
+  """The time, in milliseconds since Jan. 1, 1970, when the relationship became inactive. If there is no endTime, the relationship is active from startTime until the present or any point in the future. If endTime and startTime are set, the endTime must be greater than startTime."""
+  endTime: Int
+  """External ID of the relationship, must be unique within the project."""
+  externalId: String!
+  """A list of the labels associated with this resource item."""
+  labels: [LabelInput]
+  """The external ID of the resource that is the relationship source."""
+  sourceExternalId: String!
+  """The resource type of the relationship source. Must be one of the specified values."""
+  sourceType: String!
+  """The time, in milliseconds since Jan. 1, 1970, when the relationship became active. If there is no startTime, the relationship is active from the beginning of time until endTime."""
+  startTime: Int
+  """The external ID of the resource that is the relationship target."""
+  targetExternalId: String!
+  """The resource type of the relationship target. Must be one of the specified values."""
+  targetType: String!
+}
+
+"""Response with a list of elements."""
+type ItemsResponseCreateExtPipeRunResponse {
+  items: [CreateExtPipeRunResponse]
+}
+
+type CreateExtPipeRunResponse {
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  createdTime: Float
+  """Extraction Pipeline external Id."""
+  externalId: String
+  """A server-generated ID for the object."""
+  id: Float
+  """Error message."""
+  message: String
+  """Extraction Pipeline status."""
+  status: String!
+}
+
+input ItemsRequestExtPipeRunRequestInput {
+  items: [ExtPipeRunRequestInput]!
+}
+
+"""Status of the extraction pipeline."""
+input ExtPipeRunRequestInput {
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  createdTime: Float
+  """Extraction pipeline external Id provided by client. Should be unique within the project."""
+  externalId: String!
+  """Error message."""
+  message: String
+  """A status attribute represents the final status of a particular job run by an extraction pipeline. Utilize `success` and `failure` to indicate if the run has succeeded or failed for any reason. In addition, a heartbeat can be implemented by an extraction pipeline by periodically sending `seen` status represented by last seen and last connected time."""
+  status: ExtPipeRunStatus!
+}
+
+enum ExtPipeRunStatus {
+  SUCCESS
+  FAILURE
+  SEEN
+}
+
+type SecurityCategoryResponse {
+  items: [SecurityCategoryDTO]
+}
+
+input DataSecurityCategorySpecDTOInput {
+  items: [SecurityCategorySpecDTOInput]!
+}
+
+input SecurityCategorySpecDTOInput {
+  """Name of the security category"""
+  name: String!
+}
+
+type DataGetSequence {
+  items: [GetSequenceDTO]!
+}
+
+input DataPostSequenceInput {
+  items: [PostSequenceDTOInput]!
+}
+
+"""Describes a new sequence"""
+input PostSequenceDTOInput {
+  """Optional asset this sequence is associated with"""
+  assetId: Float
+  """List of column definitions. Maximum number of numeric columns is 400. Maximum number of string columns is 200. Maximum total number of columns is 400."""
+  columns: [PostSequenceColumnDTOInput]!
+  """The dataSet Id for the item."""
+  dataSetId: Float
+  """Description of the sequence"""
+  description: String
+  """The external ID provided by the client. Must be unique for the resource type."""
+  externalId: String
+  """Custom, application specific metadata. String key -> String value. Limits: Maximum length of key is 128 bytes, up to 256 key-value pairs, up to a total size of 10000 bytes across all keys and values."""
+  metadata: JSON
+  """Name of the sequence"""
+  name: String
+}
+
+"""Describes a new column"""
+input PostSequenceColumnDTOInput {
+  """Description of the column"""
+  description: String
+  """User provided column identifier (Unique for a given sequence)"""
+  externalId: String!
+  """Custom, application specific metadata. String key -> String value"""
+  metadata: JSON
+  """Human readable name of the sequence"""
+  name: String
+  """What type the datapoints in a column will have. DOUBLE is restricted to the range [-1E100, 1E100]"""
+  valueType: SequenceValueTypeEnum
+}
+
+type DataRawDBTable {
+  items: [RawDBTable]
+}
+
+input DataRawDBTableInput {
+  items: [RawDBTableInput]
+}
+
+"""A NoSQL database table to store customer data"""
+input RawDBTableInput {
+  """Unique name of the table"""
+  name: String!
+}
+
+input ApiV1Project3dModelRevisionMappingsDeleteInput {
+  items: [DeleteAssetMapping3DInput]!
+}
+
+input DeleteAssetMapping3DInput {
+  """The ID of the associated asset (Cognite's Assets API)."""
+  assetId: Float!
+  """The ID of the node."""
+  nodeId: Float!
+}
+
+input DataIdentifiersInput {
+  """List of ID objects"""
+  items: [DataIdentifierInput]!
+}
+
+input DataIdentifierInput {
+  """A server-generated ID for the object."""
+  id: Float!
+}
+
+input DeleteRequestInput {
+  """Ignore IDs and external IDs that are not found"""
+  ignoreUnknownIds: Boolean
+  items: [JSON]!
+  """Recursively delete all asset subtrees under the specified IDs."""
+  recursive: Boolean
+}
+
+input DeleteRawDBInput {
+  items: [RawDBInput]
+  """When true, tables of this database are deleted with the database."""
+  recursive: Boolean
+}
+
+input DatapointsDeleteQueryInput {
+  """List of delete filters"""
+  items: [JSON]!
+}
+
+input ItemsRequestExtPipeIdInput {
+  items: [JSON]!
+}
+
+input FileDataIdsInput {
+  items: [JSON]
+}
+
+input ApiV1ProjectRelationshipsDeleteInput {
+  """Ignore external IDs that are not found."""
+  ignoreUnknownIds: Boolean
+  items: [ExternalIdObjectInput]!
+}
+
+input DataRawDBRowKeyInput {
+  items: [RawDBRowKeyInput]
+}
+
+"""A row key"""
+input RawDBRowKeyInput {
+  """Unique row key"""
+  key: String!
+}
+
+input DataLongInput {
+  items: [Float]!
+}
+
+input DataSequenceDataDeleteRequestInput {
+  items: [JSON]!
+}
+
+input DataResourceIdsWithIgnoreUnknownIdsInput {
+  """Ignore IDs and external IDs that are not found"""
+  ignoreUnknownIds: Boolean
+  items: [JSON]!
+}
+
+input TimeSeriesLookupByIdInput {
+  """Ignore IDs and external IDs that are not found"""
+  ignoreUnknownIds: Boolean
+  """List of ID objects"""
+  items: [JSON]!
+}
+
+type ApiV1ProjectContextDiagramConvert2 {
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  createdTime: Float!
+  """Return the SVG version in grayscale colors only (reduces the file size)."""
+  grayscale: Boolean
+  items: [JSON]!
+  """Contextualization job ID."""
+  jobId: Float!
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  startTime: Float!
+  """The status of the job."""
+  status: JobStatus!
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  statusTime: Float!
+}
+
+input ApiV1ProjectContextDiagramConvertInput {
+  """Return the SVG version in grayscale colors only (reduces the file size)."""
+  grayscale: Boolean
+  """An array of files and annotations to create interactive diagrams."""
+  items: [JSON]!
+}
+
+type ApiV1ProjectContextDiagramDetect2 {
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  createdTime: Float!
+  items: [JSON]!
+  """Contextualization job ID."""
+  jobId: Float!
+  """Each detected item must match the detected entity on at least this number of tokens. A token is a substring of consecutive letters or digits."""
+  minTokens: Int
+  """Allow partial (fuzzy) matching of entities in the engineering diagrams. Creates a match only when it is possible to do so unambiguously."""
+  partialMatch: Boolean
+  """This field determines the string to search for and to identify object entities."""
+  searchField: String
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  startTime: Float!
+  """The status of the job."""
+  status: JobStatus!
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  statusTime: Float!
+}
+
+input ApiV1ProjectContextDiagramDetectInput {
+  """A list of entities to look for. For example, all the assets under a root node. The `searchField` determines the strings that identify the entities."""
+  entities: [JSON]!
+  """Files to run entity detection on."""
+  items: [JSON]!
+  """Each detected item must match the detected entity on at least this number of tokens. A token is a substring of consecutive letters or digits."""
+  minTokens: Int
+  """Allow partial (fuzzy) matching of entities in the engineering diagrams. Creates a match only when it is possible to do so unambiguously."""
+  partialMatch: Boolean
+  """This field determines the string to search for and to identify object entities."""
+  searchField: String
+}
+
+type ApiV1ProjectFilesDownloadlink {
+  items: [Items16ListItem]
+}
+
+"""No description available."""
+union Items16ListItem = FileInternalId | FileExternalId
+
+type FileInternalId {
+  """A server-generated ID for the object."""
+  id: Float
+}
+
+type FileExternalId {
+  """The external ID provided by the client. Must be unique for the resource type."""
+  externalId: String
+}
+
+input FileLinkIdsInput {
+  items: [JSON]
+}
+
+input ApiV1ProjectContextEntitymatching2Input {
+  """The classifier used in the model. Only relevant if there are trueMatches/labeled data and a supervised model is fitted."""
+  classifier: Classifier2
+  """User defined description."""
+  description: String
+  """The external ID provided by the client. Must be unique for the resource type."""
+  externalId: String
+  """
+  Each feature type defines one combination of features that will be created and used in the entity matcher model. All features are based on matching tokens. Tokens are defined at the top of the Entity matching section.
+  The options are:
+    * Simple: Calculates the cosine-distance similarity score for each of the pairs of fields defined in `matchFields`. This is the fastest option.
+    * Insensitive: Similar to Simple, but ignores lowercase/uppercase differences.
+    * Bigram: Similar to `simple`, but adds similarity score based on matching bigrams of the tokens.
+    * FrequencyWeightedBigram: Similar to `bigram`, but give higher weights to less commonly occurring tokens.
+    * BigramExtraTokenizers: Similar to `bigram`, but able to learn that leading zeros, spaces, and uppercase/lowercase differences should be ignored in matching.
+    * BigramCombo: Calculates all of the above options, relying on the model to determine the appropriate features to use.
+    Hence, this option is only appropriate if there are  labeled data/trueMatches. This is the slowest option.
+  
+  """
+  featureType: String
+  """If True, replaces missing fields in `sources` or `targets` entities, for fields set in set in `matchFields`, with empty strings. Else, returns an error if there are missing data."""
+  ignoreMissingFields: Boolean
+  """List of pairs of fields from the target and source items used to calculate features. All source and target items should have all the `source` and `target` fields specified here."""
+  matchFields: [MatchFieldsListItemInput]
+  """User defined name."""
+  name: String
+  """List of custom source object to match from, for example, time series. String key -> value. Only string values are considered in the matching. Both `id` and `externalId` fields are optional, only mandatory if the item is to be referenced in `trueMatches`."""
+  sources: [JSON]!
+  """List of custom target object to match to, for example, assets. String key -> value. Only string values are considered in the matching. Both `id` and `externalId` fields are optional, only mandatory if the item is to be referenced in `trueMatches`."""
+  targets: [JSON]!
+  """List of objects of pairs of sourceId or sourceExternalId and targetId or targetExternalId, that corresponds to entities in source and target respectively, that indicates a confirmed match used to train the model. If omitted, an unsupervised model is used."""
+  trueMatches: [[JSON]]
+}
+
+enum Classifier2 {
+  RANDOMFOREST
+  DECISIONTREE
+  LOGISTICREGRESSION
+  AUGMENTEDLOGISTICREGRESSION
+  AUGMENTEDRANDOMFOREST
+}
+
+input MatchFieldsListItemInput {
+  source: String!
+  target: String!
+}
+
+input ApiV1ProjectContextEntitymatchingDeleteInput {
+  """List of ids or externalIds of models."""
+  items: [JSON]!
+}
+
+type ApiV1ProjectContextEntitymatchingList2 {
+  items: [EntityMatcherResponseSchema]!
+}
+
+input ApiV1ProjectContextEntitymatchingListInput {
+  filter: Filter5Input!
+  """<- Limits the number of results to return."""
+  limit: Int
+}
+
+input Filter5Input {
+  """The classifier used in the model. Only relevant if there are trueMatches/labeled data and a supervised model is fitted."""
+  classifier: Classifier2
+  """User defined description."""
+  description: String
+  """Each feature type defines the combination of features that will be created and used in the entity matcher model."""
+  featureType: FeatureType
+  """User defined name."""
+  name: String
+  """The ID of original model, only relevant when the model is a retrained model."""
+  originalId: Int
+}
+
+type ApiV1ProjectContextEntitymatchingPredict {
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  createdTime: Float!
+  """Contextualization job ID."""
+  jobId: Float!
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  startTime: Float!
+  """The status of the job."""
+  status: JobStatus!
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  statusTime: Float!
+}
+
+type ApiV1ProjectContextEntitymatchingRefit {
+  """Name of the classifier used in the model, "Unsupervised" if unsupervised model."""
+  classifier: String!
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  createdTime: Float!
+  """User defined description."""
+  description: String!
+  """The external ID provided by the client. Must be unique for the resource type."""
+  externalId: String!
+  """Each feature type defines the combination of features that will be created and used in the entity matcher model."""
+  featureType: FeatureType!
+  """A server-generated ID for the object."""
+  id: Float!
+  """If True, missing fields in `sources` or `targets` entities set in `matchFields`, are replaced with empty strings."""
+  ignoreMissingFields: Boolean
+  """List of pairs of fields from the target and source items used to calculate features. All source and target items should have all the `source` and `target` fields specified here."""
+  matchFields: [MatchFieldsListItem]
+  """User defined name."""
+  name: String!
+  """The ID of original model, only relevant when the model is a retrained model."""
+  originalId: Int!
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  startTime: Float!
+  """The status of the job."""
+  status: JobStatus!
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  statusTime: Float!
+}
+
+type ApiV1ProjectContextEntitymatchingByids2 {
+  items: [EntityMatcherResponseSchema]!
+}
+
+input ApiV1ProjectContextEntitymatchingByidsInput {
+  """List of ids or externalIds of models."""
+  items: [JSON]!
+}
+
+type ApiV1ProjectContextEntitymatchingUpdate2 {
+  items: [EntityMatcherResponseSchema]!
+}
+
+input ApiV1ProjectContextEntitymatchingUpdateInput {
+  items: [JSON]!
+}
+
+input AssetMapping3DFilterRequestInput {
+  cursor: String
+  filter: JSON
+  """Limits the number of results to return."""
+  limit: Int
+}
+
+"""Filter request for nodes. Filters nodes with properties matching ones in a list of alternatives."""
+input Node3DFilterBodyInput {
+  cursor: String
+  """Filters used in the search."""
+  filter: Node3DPropertyFilterInput
+  """Limits the number of results to return."""
+  limit: Int
+  """
+  Splits the data set into N partitions.
+  You need to follow the cursors within each partition in order to receive all the data.
+  Example: 1/10
+  
+  """
+  partition: String
+}
+
+"""Filters used in the search."""
+input Node3DPropertyFilterInput {
+  """Contains one or more categories (namespaces), each of which contains one or more properties. Each property is associated with a list of values. The list of values acts as an OR-clause, so that if a node's corresponding property value equals ANY of the strings in the list, it satisfies the condition for that property. The different properties are concatenated with AND-operations, so that a node must satisfy the condition for ALL properties from all categories to be part of the returned set. The allowed number of property values is limited to 1000 values in total."""
+  properties: JSON
+}
+
+input ExtPipesFilterRequestInput {
+  cursor: String
+  filter: JSON
+  """Limits the number of results to return."""
+  limit: Int
+}
+
+input RunsFilterRequestInput {
+  cursor: String
+  filter: RunsFilterInput!
+  """Limits the number of results to return."""
+  limit: Int
+}
+
+input RunsFilterInput {
+  """Range between two timestamps (inclusive)."""
+  createdTime: EpochTimestampRangeInput
+  """Extraction pipeline external Id provided by client."""
+  externalId: String!
+  message: StringFilterInput
+  """Extraction pipeline statuses list. Expected values: success, failure, seen."""
+  statuses: [ExtPipeRunStatus]
+}
+
+input StringFilterInput {
+  """Substring to find strings, that contains it ignoring case."""
+  substring: String
+}
+
+type Node3DList {
+  items: [Node3D]!
+}
+
+input Node3DIdsInput {
+  items: [Node3DIdInput]!
+}
+
+input Node3DIdInput {
+  """The ID of the node."""
+  id: Float!
+}
+
+input DataSetIdEitherListInput {
+  """Ignore IDs and external IDs that are not found"""
+  ignoreUnknownIds: Boolean
+  items: [JSON]!
+}
+
+"""The list of responses. The order matches the requests order."""
+type DatapointsResponse {
+  items: [JSON]!
+}
+
+input DatapointsLatestQueryInput {
+  """Ignore IDs and external IDs that are not found"""
+  ignoreUnknownIds: Boolean
+  """List of latest queries"""
+  items: [JSON]!
+}
+
+"""Data from a sequence"""
+type SequenceGetData {
+  """Column information in order given by data"""
+  columns: [BasicGetSequenceColumnInfo]!
+  """The external ID provided by the client. Must be unique for the resource type."""
+  externalId: String
+  """A server-generated ID for the object."""
+  id: Float!
+  """List of row information"""
+  rows: [SequenceRowDTO]!
+}
+
+"""Column information returned on data requests"""
+type BasicGetSequenceColumnInfo {
+  """User provided column identifier (Unique for a given sequence)"""
+  externalId: String
+  """Human readable name of the column"""
+  name: String
+  """What type the datapoints in a column will have. DOUBLE is restricted to the range [-1E100, 1E100]"""
+  valueType: SequenceValueTypeEnum
+}
+
+"""A single row of datapoints"""
+type SequenceRowDTO {
+  """The row number for this row"""
+  rowNumber: Float!
+  """List of values in order defined in the columns field (Number of items must match. Null is accepted for missing values. String values must be no longer than 256 characters)"""
+  values: [JSON]!
+}
+
+"""The list of responses. The order matches the requests order."""
+type DatapointsOrAggregatesResponse {
+  items: [JSON]!
+}
+
+input DatapointsMultiQueryInput {
+  """Specify the aggregates to return, or an empty array if this sub-query should return datapoints without aggregation. This value overrides a top-level default aggregates list."""
+  aggregates: [Aggregate]
+  """Get datapoints up to, but excluding, this point in time. Same format as for start. Note that when using aggregates, the end will be rounded up such that the last aggregate represents a full aggregation interval containing the original end, where the interval is the granularity unit times the granularity multiplier. For granularity 2d, the aggregation interval is 2 days, if end was originally 3 days after the start, it will be rounded to 4 days after the start."""
+  end: JSON
+  """The time granularity size and unit to aggregate over. Valid entries are 'day, hour, minute, second', or short forms 'd, h, m, s', or a multiple of these indicated by a number as a prefix. For 'second' and 'minute' the multiple must be an integer betwen 1 and 120 inclusive, for 'hour' and 'day' the multiple must be an integer between 1 and 100000 inclusive. For example, a granularity '5m' means that aggregates are calculated over 5 minutes. This field is required if aggregates are specified."""
+  granularity: String
+  """Ignore IDs and external IDs that are not found"""
+  ignoreUnknownIds: Boolean
+  """Whether to include the last datapoint before the requested time period, and the first one after. This option is useful for interpolating data. It is not available for aggregates."""
+  includeOutsidePoints: Boolean
+  items: [JSON]!
+  """Return up to this number of datapoints. The maximum is 100000 non-aggregated data points and 10000 aggregated data points in total across all queries in a single request."""
+  limit: Int
+  """
+  Get datapoints starting from, and including, this time. The format is N[timeunit]-ago where
+  timeunit is w,d,h,m,s. Example: '2d-ago' gets datapoints that are up to 2 days
+  old. You can also specify time in milliseconds since epoch. Note that for aggregates, the start time is rounded down to a whole granularity unit (in UTC timezone). Daily granularities (d)
+  are rounded to 0:00 AM; hourly granularities (h) to the start of the hour, etc.
+  """
+  start: JSON
+}
+
+enum Aggregate {
+  AVERAGE
+  MAX
+  MIN
+  COUNT
+  SUM
+  INTERPOLATION
+  STEPINTERPOLATION
+  TOTALVARIATION
+  CONTINUOUSVARIANCE
+  DISCRETEVARIANCE
+}
+
+type SequenceGetDataWithCursor {
+  """Column information in order given by data"""
+  columns: [BasicGetSequenceColumnInfo]!
+  """The external ID provided by the client. Must be unique for the resource type."""
+  externalId: String
+  """A server-generated ID for the object."""
+  id: Float!
+  """Cursor to get the next page of results (if available)."""
+  nextCursor: String
+  """List of row information"""
+  rows: [SequenceRowDTO]!
+}
+
+type ApiV1ProjectFiles {
+  assetIds: [Float]
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  createdTime: Float!
+  """The dataSet Id for the item."""
+  dataSetId: Float
+  """Directory containing the file. Must be an absolute, unix-style path."""
+  directory: String
+  """The external ID provided by the client. Must be unique for the resource type."""
+  externalId: String
+  """The geographic metadata of the file."""
+  geoLocation: GeoLocation
+  """A server-generated ID for the object."""
+  id: Float!
+  """A list of the labels associated with this resource item."""
+  labels: [Label]
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  lastUpdatedTime: Float!
+  """Custom, application specific metadata. String key -> String value. Limits: Maximum length of key is 128 bytes, value 10240 bytes, up to 256 key-value pairs, of total size at most 10240."""
+  metadata: JSON
+  """File type. E.g. text/plain, application/pdf, .."""
+  mimeType: String
+  """Name of the file."""
+  name: String!
+  """The security category IDs required to access this file."""
+  securityCategories: [Float]
+  """The source of the file."""
+  source: String
+  sourceCreatedTime: Int
+  sourceModifiedTime: Int
+  """The URL where the file contents should be uploaded."""
+  uploadUrl: String!
+  """Whether or not the actual file is uploaded.  This field is returned only by the API, it has no effect in a post body."""
+  uploaded: Boolean!
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  uploadedTime: Float
+}
+
+input ExternalFilesMetadataInput {
+  assetIds: [Float]
+  """The dataSet Id for the item."""
+  dataSetId: Float
+  """Directory containing the file. Must be an absolute, unix-style path."""
+  directory: String
+  """The external ID provided by the client. Must be unique for the resource type."""
+  externalId: String
+  """The geographic metadata of the file."""
+  geoLocation: GeoLocationInput
+  """A list of the labels associated with this resource item."""
+  labels: [LabelInput]
+  """Custom, application specific metadata. String key -> String value. Limits: Maximum length of key is 128 bytes, value 10240 bytes, up to 256 key-value pairs, of total size at most 10240."""
+  metadata: JSON
+  """File type. E.g. text/plain, application/pdf, .."""
+  mimeType: String
+  """Name of the file."""
+  name: String!
+  """The security category IDs required to access this file."""
+  securityCategories: [Float]
+  """The source of the file."""
+  source: String
+  sourceCreatedTime: Int
+  sourceModifiedTime: Int
+}
+
+"""The geographic metadata of the file."""
+input GeoLocationInput {
+  """Represents the points, curves and surfaces in the coordinate space."""
+  geometry: JSON!
+  """Additional properties in a String key -> Object value format."""
+  properties: JSON
+  """One of the GeoJSON types. Currently only the 'Feature' type is supported."""
+  type: Type!
+}
+
+input AssetListScopeInput {
+  """Set of aggregated properties to include"""
+  aggregatedProperties: [AggregatedProperty]
+  cursor: String
+  """Filter on assets with strict matching."""
+  filter: FilterInput
+  """Limits the number of results to return."""
+  limit: Int
+  """
+  Splits the data set into N partitions.
+  You need to follow the cursors within each partition in order to receive all the data.
+  Example: 1/10
+  
+  """
+  partition: String
+}
+
+type DataSetListWithCursor {
+  items: [DataSet]!
+  """The cursor to get the next page of results (if available)."""
+  nextCursor: String
+}
+
+input DataSetFilterRequestInput {
+  cursor: String
+  """Filter on data sets with strict matching."""
+  filter: DataSetFilterInput
+  """Limits the number of results to return."""
+  limit: Int
+}
+
+type PagedEnrichedRelationshipResponseWrapper {
+  items: [EnrichedRelationshipResponse]!
+  """The cursor to get the next page of results (if available)."""
+  nextCursor: String
+}
+
+input RelationshipsAdvancedListRequestInput {
+  cursor: String
+  """
+  If true,
+  will try to fetch the resources referred to in the relationship,
+  based on the users access rights.
+  Will silently fail to attatch the resources if the user lacks access to some of them.
+  
+  """
+  fetchResources: Boolean
+  """Filter on relationships with exact match. Multiple filter elements in one property, for example `sourceExternalIds: [ "a", "b" ], returns all relationships where the sourceExternalId field is either `a` or `b`. Filters in multiple properties return relationships that match all criteria. If the filter is not specified, it defaults to an empty filter."""
+  filter: AdvancedListFilterInput
+  """Limits the number of results to return."""
+  limit: Int
+  """
+  Splits the data set into N partitions.
+  You need to follow the cursors within each partition in order to receive all the data.
+  Example: 1/10
+  
+  """
+  partition: String
+}
+
+"""Filter on relationships with exact match. Multiple filter elements in one property, for example `sourceExternalIds: [ "a", "b" ], returns all relationships where the sourceExternalId field is either `a` or `b`. Filters in multiple properties return relationships that match all criteria. If the filter is not specified, it defaults to an empty filter."""
+input AdvancedListFilterInput {
+  """Limits results to those active within the specified time range, that is, if there is any overlap in the intervals [`activeAtTime.min`, `activeAtTime.max`] and [`startTime`, `endTime`], where both intervals are inclusive. If a relationship does not have a `startTime`, it is regarded as active from the beginning of time by this filter. If it does not have an `endTime` is is regarded as active until the end of time. Similarly, if a `min` is not supplied to the filter, the `min` is implicitly set to the beginning of time. If a `max` is not supplied, the `max` is implicitly set to the end of time."""
+  activeAtTime: ActiveAtTimeInput
+  """Range to filter the field for (inclusive)."""
+  confidence: FloatRangeInput
+  """Range between two timestamps (inclusive)."""
+  createdTime: EpochTimestampRangeInput
+  dataSetIds: [JSON]
+  """Range between two timestamps (inclusive)."""
+  endTime: EpochTimestampRangeInput
+  """Return only the resource matching the specified label constraints."""
+  labels: JSON
+  """Range between two timestamps (inclusive)."""
+  lastUpdatedTime: EpochTimestampRangeInput
+  """Include relationships that have any of these values in their `sourceExternalId` field"""
+  sourceExternalIds: [String]
+  """Include relationships that have any of these values in their `sourceType` field"""
+  sourceTypes: [ResourceType]
+  """Include relationships that match any of the resources in either their source- or target-related fields."""
+  sourcesOrTargets: [ResourceReferenceWithExternalIdInput]
+  """Range between two timestamps (inclusive)."""
+  startTime: EpochTimestampRangeInput
+  """Include relationships that have any of these values in their `targetExternalId` field"""
+  targetExternalIds: [String]
+  """Include relationships that have any of these values in their `targetType` field"""
+  targetTypes: [ResourceType]
+}
+
+"""Limits results to those active within the specified time range, that is, if there is any overlap in the intervals [`activeAtTime.min`, `activeAtTime.max`] and [`startTime`, `endTime`], where both intervals are inclusive. If a relationship does not have a `startTime`, it is regarded as active from the beginning of time by this filter. If it does not have an `endTime` is is regarded as active until the end of time. Similarly, if a `min` is not supplied to the filter, the `min` is implicitly set to the beginning of time. If a `max` is not supplied, the `max` is implicitly set to the end of time."""
+input ActiveAtTimeInput {
+  """Maximum timestamp (inclusive). The timestamp is represented as number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  max: Float
+  """Minimum timestamp (inclusive). The timestamp is represented as number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  min: Float
+}
+
+"""Range to filter the field for (inclusive)."""
+input FloatRangeInput {
+  max: Float
+  min: Float
+}
+
+enum ResourceType {
+  ASSET
+  TIMESERIES
+  FILE
+  EVENT
+  SEQUENCE
+}
+
+input ResourceReferenceWithExternalIdInput {
+  externalId: String
+  type: ResourceType
+}
+
+"""Filter request for time series. Filters exact field matching or timestamp ranges inclusive min and max."""
+input TimeSeriesListDTOInput {
+  cursor: String
+  filter: Filter4Input
+  """Return up to this many results."""
+  limit: Int
+  """
+  Splits the data set into N partitions.
+  You need to follow the cursors within each partition in order to receive all the data.
+  Example: 1/10
+  
+  """
+  partition: String
+}
+
+input DatapointsInsertQueryInput {
+  items: [JSON]!
+}
+
+input DataRawDBRowInput {
+  items: [RawDBRowInsertInput]
+}
+
+input RawDBRowInsertInput {
+  """Row data stored as a JSON object."""
+  columns: JSON!
+  """Unique row key"""
+  key: String!
+}
+
+input DataSequencePostDataInput {
+  items: [JSON]!
+}
+
+input TimeSeriesCreateRequestInput {
+  items: [PostTimeSeriesMetadataDTOInput]!
+}
+
+input PostTimeSeriesMetadataDTOInput {
+  """Asset ID of equipment linked to this time series."""
+  assetId: Int
+  """The dataSet Id for the item."""
+  dataSetId: Float
+  """A description of the time series."""
+  description: String
+  """Externally provided ID for the time series (optional, but recommended.)"""
+  externalId: String
+  """Whether the time series is a step series or not."""
+  isStep: Boolean
+  """Whether the time series is string valued or not. (not updatable - its value cannot be changed after its initial assignment.)"""
+  isString: Boolean
+  """This field is deprecated. Set a value for legacyName to allow applications using API v0.3, v04, v05, and v0.6 to access this time series. The legacy name is the human-readable name for the time series and is mapped to the name field used in API versions 0.3-0.6. The legacyName field value must be unique, and setting this value to an already existing value will return an error. We recommend that you set this field to the same value as externalId."""
+  legacyName: String
+  """Custom, application specific metadata. String key -> String value. Limits: Maximum length of key is 128 bytes, up to 256 key-value pairs, of total size of at most 10000 bytes across all keys and values."""
+  metadata: JSON
+  """Human readable name of the time series. This field is seperate from name field available through API versions 0.3-0.6."""
+  name: String
+  """The required security categories to access this time series."""
+  securityCategories: [Float]
+  """The physical unit of the time series."""
+  unit: String
+}
+
+type SyntheticQueryResponses {
+  items: [SyntheticQueryResponse]!
+}
+
+type SyntheticQueryResponse {
+  """list of data points"""
+  datapoints: [SyntheticDataPoint]!
+  """whether the returned data points are of string type or floating point type. Currently it will always be false."""
+  isString: Boolean
+}
+
+"""No description available."""
+union SyntheticDataPoint = SyntheticDataValue | SyntheticDataError
+
+type SyntheticDataValue {
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  timestamp: Float!
+  """the data value"""
+  value: Float!
+}
+
+type SyntheticDataError {
+  """Human readable string with description of what went wrong"""
+  error: String!
+  """The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds."""
+  timestamp: Float!
+}
+
+input SyntheticMultiQueryInput {
+  items: [SyntheticQueryInput]!
+}
+
+"""Synthetic query description"""
+input SyntheticQueryInput {
+  """Get datapoints up to, but excluding, this point in time. Same format as for start. Note that when using aggregates, the end will be rounded up such that the last aggregate represents a full aggregation interval containing the original end, where the interval is the granularity unit times the granularity multiplier. For granularity 2d, the aggregation interval is 2 days, if end was originally 3 days after the start, it will be rounded to 4 days after the start."""
+  end: JSON
+  """query definition. For limits, see the [guide to synthetic time series](/dev/concepts/resource_types/synthetic_timeseries.html#limits)."""
+  expression: String!
+  """Return up to this number of datapoints"""
+  limit: Int
+  """
+  Get datapoints starting from, and including, this time. The format is N[timeunit]-ago where
+  timeunit is w,d,h,m,s. Example: '2d-ago' gets datapoints that are up to 2 days
+  old. You can also specify time in milliseconds since epoch. Note that for aggregates, the start time is rounded down to a whole granularity unit (in UTC timezone). Daily granularities (d)
+  are rounded to 0:00 AM; hourly granularities (h) to the start of the hour, etc.
+  """
+  start: JSON
+}
+
+"""Search request with filter capabilities."""
+input AssetSearchFilterInput {
+  """Filter on assets with strict matching."""
+  filter: FilterInput
+  """Limits the number of results to return."""
+  limit: Int
+  """Fulltext search for assets. Primarily meant for for human-centric use-cases, not for programs. The query parameter uses a different search algorithm than the deprecated name and description parameters, and will generally give much better results."""
+  search: SearchInput
+}
+
+"""Fulltext search for assets. Primarily meant for for human-centric use-cases, not for programs. The query parameter uses a different search algorithm than the deprecated name and description parameters, and will generally give much better results."""
+input SearchInput {
+  """The description of the asset."""
+  description: String
+  """The name of the asset."""
+  name: String
+  """Whitespace-separated terms to search for in assets. Does a best-effort fuzzy search in relevant fields (currently name and description) for variations of any of the search terms, and orders results by relevance. Uses a different search algorithm than the name and description parameters, and will generally give much better results. Matching and ordering is not guaranteed to be stable over time, and the fields being searched may be extended."""
+  query: String
+}
+
+"""Filter on events filter with exact match"""
+input EventSearchRequestInput {
+  """Filter on events filter with exact match"""
+  filter: EventFilterInput
+  """<- Limits the maximum number of results to be returned by single request. Request may contain less results than request limit."""
+  limit: Int
+  search: EventSearchInput
+}
+
+input EventSearchInput {
+  """text to search in description field across events"""
+  description: String
+}
+
+"""Filter on files with exact match"""
+input FilesSearchFilterInput {
+  filter: Filter2Input
+  search: Search2Input
+}
+
+input Search2Input {
+  """Name of the file."""
+  name: String
+}
+
+input SequencesSearchDTOInput {
+  filter: SequenceFilterInput
+  """Return up to this many results."""
+  limit: Int
+  search: SequenceSearchInput
+}
+
+input SequenceSearchInput {
+  """Prefix and fuzzy search on description."""
+  description: String
+  """Prefix and fuzzy search on name."""
+  name: String
+  """Search on name and description using wildcard search on each of the words (separated by spaces). Retrieves results where at least one word must match. Example: '*some* *other*'"""
+  query: String
+}
+
+input TimeSeriesSearchDTOInput {
+  filter: Filter4Input
+  """Return up to this many results."""
+  limit: Int
+  search: Search3Input
+}
+
+input Search3Input {
+  """Prefix and fuzzy search on description."""
+  description: String
+  """Prefix and fuzzy search on name."""
+  name: String
+  """
+  Whitespace-separated terms to search for in time series. Does a
+  best-effort fuzzy search in relevant fields (currently name and
+  description) for variations of any of the search terms, and
+  orders results by relevance. Uses a different search algorithm
+  than the name and description parameters, and will generally give
+  much better results. Matching and ordering is not guaranteed to
+  be stable over time, and the fields being searched may be
+  extended.
+  """
+  query: String
+}
+
+input ApiV1Project3dModelsUpdateInput {
+  items: [UpdateModel3DInput]!
+}
+
+input UpdateModel3DInput {
+  """A server-generated ID for the object."""
+  id: Float!
+  update: UpdateInput
+}
+
+input UpdateInput {
+  dataSetId: JSON
+  metadata: JSON
+  name: SetModelNameFieldInput
+}
+
+input SetModelNameFieldInput {
+  set: String
+}
+
+input ApiV1Project3dModelRevisionsUpdateInput {
+  items: [UpdateRevision3DInput]!
+}
+
+input UpdateRevision3DInput {
+  """A server-generated ID for the object."""
+  id: Float!
+  update: Update2Input
+}
+
+input Update2Input {
+  camera: SetRevisionCameraPropertiesInput
+  metadata: JSON
+  published: Published3Input
+  rotation: SetRevisionRotationInput
+}
+
+input SetRevisionCameraPropertiesInput {
+  """Initial camera position and target."""
+  set: RevisionCameraPropertiesInput
+}
+
+input Published3Input {
+  """True if the revision is marked as published."""
+  set: Boolean
+}
+
+input SetRevisionRotationInput {
+  set: [Float]
+}
+
+input DataAssetChangeInput {
+  items: [JSON]!
+}
+
+input DataSetUpdateListInput {
+  items: [JSON]!
+}
+
+input DataEventChangeInput {
+  items: [JSON]!
+}
+
+input ItemsRequestExtPipeUpdateInput {
+  items: [JSON]!
+}
+
+input DataFileChangeInput {
+  items: [JSON]!
+}
+
+input UpdateRelationshipWrapperInput {
+  items: [RelationshipUpdateInput]!
+}
+
+input RelationshipUpdateInput {
+  """The external ID of the relationship."""
+  externalId: String!
+  update: RelationshipUpdateContentInput!
+}
+
+input RelationshipUpdateContentInput {
+  """Set a new value for the confidence, or remove the value."""
+  confidence: JSON
+  """Set a new value for the dataSet Ids, or remove the value."""
+  dataSetId: JSON
+  endTime: JSON
+  """
+  Updates the resource's assigned labels.
+  
+  Labels can be added, removed or replaced (set). Adding an already attached label is an idempotent operation. Removing a label with no matching externalId is silently ignored.
+  """
+  labels: JSON
+  """Set a new value for the relationship source external ID."""
+  sourceExternalId: UpdateSourceExternalIdInput
+  """Set a new value for the relationship source type."""
+  sourceType: UpdateSourceTypeInput
+  """Set a new value for the start time, or remove the value."""
+  startTime: JSON
+  """Set a new value for the relationship target external ID."""
+  targetExternalId: UpdateTargetExternalIdInput
+  """Set a new value for the relationship target type."""
+  targetType: UpdateTargetTypeInput
+}
+
+"""Set a new value for the relationship source external ID."""
+input UpdateSourceExternalIdInput {
+  """The external ID of the resource that is the relationship source."""
+  set: String!
+}
+
+"""Set a new value for the relationship source type."""
+input UpdateSourceTypeInput {
+  """The resource type of the relationship source. Must be one of the specified values."""
+  set: String!
+}
+
+"""Set a new value for the relationship target external ID."""
+input UpdateTargetExternalIdInput {
+  """The external ID of the resource that is the relationship target."""
+  set: String!
+}
+
+"""Set a new value for the relationship target type."""
+input UpdateTargetTypeInput {
+  """The resource type of the relationship target. Must be one of the specified values."""
+  set: String!
+}
+
+input DataSequenceChangeInput {
+  items: [JSON]!
+}
+
+"""Request body for the updateModelRevisionThumbnail endpoint."""
+input UpdateRevision3DThumbnailInput {
+  """File ID of thumbnail file in Files API. _Only JPEG and PNG files are supported_."""
+  fileId: Float!
+}
