@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "mesh dev",
-    "build": "echo \"noop\";"
+    "build": "mesh build && mesh start"
   },
   "author": "",
   "license": "ISC",

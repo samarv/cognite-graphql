@@ -11418,6 +11418,18 @@ const baseDir = pathModule.join(typeof __dirname === 'string' ? __dirname : '/',
 const importFn = (moduleId: string) => {
   const relativeModuleId = (pathModule.isAbsolute(moduleId) ? pathModule.relative(baseDir, moduleId) : moduleId).split('\\').join('/').replace(baseDir + '/', '');
   switch(relativeModuleId) {
+    case "@graphql-mesh/cache-localforage":
+      return import("@graphql-mesh/cache-localforage");
+    
+    case "@graphql-mesh/openapi":
+      return import("@graphql-mesh/openapi");
+    
+    case "@graphql-mesh/merger-bare":
+      return import("@graphql-mesh/merger-bare");
+    
+    case ".mesh/sources/MyOpenapiApi/oas-schema":
+      return import("./sources/MyOpenapiApi/oas-schema");
+    
     default:
       return Promise.reject(new Error(`Cannot find module '${relativeModuleId}'.`));
   }
@@ -11432,18 +11444,80 @@ const rootStore = new MeshStore('.mesh', new FsStoreStorageAdapter({
   validate: false
 });
 
+import { GetMeshOptions } from '@graphql-mesh/runtime';
+import { YamlConfig } from '@graphql-mesh/types';
+import { PubSub } from '@graphql-mesh/utils';
+import MeshCache from '@graphql-mesh/cache-localforage';
+import { DefaultLogger } from '@graphql-mesh/utils';
+import OpenapiHandler from '@graphql-mesh/openapi'
+import BareMerger from '@graphql-mesh/merger-bare';
+import { resolveAdditionalResolvers } from '@graphql-mesh/utils';
+import { parseWithCache } from '@graphql-mesh/utils';
+export const rawConfig: YamlConfig.Config = {"sources":[{"name":"MyOpenapiApi","handler":{"openapi":{"source":"./cogniteV789.json","baseUrl":"https://api.cognitedata.com","operationHeaders":{"Authorization":"Bearer {context.headers['x-cognite-token']}"}}}}]} as any
+export async function getMeshOptions(): Promise<GetMeshOptions> {
+const pubsub = new PubSub();
+const cache = new (MeshCache as any)({
+      ...(rawConfig.cache || {}),
+      importFn,
+      store: rootStore.child('cache'),
+      pubsub,
+    } as any)
+const sourcesStore = rootStore.child('sources');
+const logger = new DefaultLogger('🕸️  Mesh');
+const sources = [];
+const transforms = [];
+const myOpenapiApiTransforms = [];
+const additionalTypeDefs = [] as any[];
+const myOpenapiApiHandler = new OpenapiHandler({
+              name: rawConfig.sources[0].name,
+              config: rawConfig.sources[0].handler["openapi"],
+              baseDir,
+              cache,
+              pubsub,
+              store: sourcesStore.child(rawConfig.sources[0].name),
+              logger: logger.child(rawConfig.sources[0].name),
+              importFn
+            });
+sources.push({
+          name: 'MyOpenapiApi',
+          handler: myOpenapiApiHandler,
+          transforms: myOpenapiApiTransforms
+        })
+const merger = new(BareMerger as any)({
+        cache,
+        pubsub,
+        logger: logger.child('BareMerger'),
+        store: rootStore.child('bareMerger')
+      })
+const additionalResolversRawConfig = [];
+const additionalResolvers = await resolveAdditionalResolvers(
+      baseDir,
+      additionalResolversRawConfig,
+      importFn,
+      pubsub
+  )
+const liveQueryInvalidations = rawConfig.liveQueryInvalidations;
+const additionalEnvelopPlugins = [];
+const documents = documentsInSDL.map((documentSdl: string, i: number) => ({
+              rawSDL: documentSdl,
+              document: parseWithCache(documentSdl),
+              location: `document_${i}.graphql`,
+            }))
 
-                import { findAndParseConfig } from '@graphql-mesh/cli';
-                function getMeshOptions() {
-                  console.warn('WARNING: These artifacts are built for development mode. Please run "mesh build" to build production artifacts');
-                  return findAndParseConfig({
-                    dir: baseDir,
-                    artifactsDir: ".mesh",
-                    configName: "mesh",
-                    additionalPackagePrefixes: [],
-                  });
-                }
-              
+  return {
+    sources,
+    transforms,
+    additionalTypeDefs,
+    additionalResolvers,
+    cache,
+    pubsub,
+    merger,
+    logger,
+    liveQueryInvalidations,
+    additionalEnvelopPlugins,
+    documents,
+  };
+}
 
 export const documentsInSDL = /*#__PURE__*/ [];
 
