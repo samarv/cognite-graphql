@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "mesh dev",
-    "build": "mesh build && mesh start"
+    "dev": "mesh dev",
+    "start": "mesh start",
+    "build": "mesh build"
   },
   "author": "",
   "license": "ISC",
