@@ -3,6 +3,6 @@ sources:
     handler:
       openapi:
         source: ./cogniteV789.json
-        baseUrl: "https://api.cognitedata.com"
+        baseUrl: https://{context.headers['x-cognite-cluster']}.cognitedata.com
         operationHeaders:
           Authorization: Bearer {context.headers['x-cognite-token']}
